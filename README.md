@@ -1,3 +1,9 @@
+Quando criar branchs use: feat/adicionar-pagina-contato
+fix/corrigir-erro-validacao-email
+chore/atualizar-dependencias-npm
+refactor/otimizar-funcao-login
+docs/atualizar-readme
+
 Objetivo da Empresa
 Nossa empresa tem como objetivo oferecer soluções inovadoras e acessíveis aos nossos clientes, proporcionando uma experiência prática e de qualidade. Nosso foco é atender às necessidades do público com eficiência e transparência, seja na prestação de serviços ou na venda de produtos.
 
