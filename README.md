@@ -4,16 +4,16 @@ Nossa empresa tem como objetivo oferecer soluções inovadoras e acessíveis aos
 Objetivo do Site
 O site foi desenvolvido para ser um canal oficial de comunicação e interação com nossos clientes. Ele possibilita:
 
-Acesso a informações da empresa e dos serviços/produtos.
+Acesso a informações da empresa e das Vendas/produtos.
 
 Contato direto com a nossa equipe.
 
-Realização de orçamentos, pedidos ou agendamentos.
+Realização de vendas, pedidos.
 
 Um ambiente simples, rápido e responsivo em qualquer dispositivo.
 
 Ramo de Atividade
-Este projeto está voltado para o ramo de prestação de serviços e/ou vendas online, oferecendo ao cliente uma plataforma digital moderna para explorar, contratar e adquirir nossos produtos/serviços.
+Este projeto está voltado para o ramo de  vendas online, oferecendo ao cliente uma plataforma digital moderna para explorar, adquirir nossos produtos.
 
 Tecnologias Utilizadas
 HTML: Estruturação das páginas.
@@ -22,19 +22,17 @@ CSS: Estilização e responsividade.
 
 JavaScript (ES6+): Funcionalidade e interatividade.
 
-Frameworks/Bibliotecas: React, Bootstrap, Tailwind, entre outros.
+Frameworks/Bibliotecas: Bootstrap .
 
-Banco de Dados: MySQL, MongoDB, PostgreSQL.
+Banco de Dados:  PostgreSQL.
 
 Controle de Versão: Git/GitHub para versionamento e colaboração.
 
 Hospedagem
-O site será hospedado em plataformas como Vercel, Netlify, AWS, HostGator ou GitHub Pages, garantindo estabilidade, segurança e escalabilidade.
+O site será hospedado em plataformas como Vercel ou GitHub Pages, garantindo estabilidade, segurança e escalabilidade.
 
 APIs Utilizadas
-API de Pagamento: PayPal, Stripe, PagSeguro para processamento de transações online.
-
-API de Geolocalização: Google Maps para localização de unidades físicas.
+API de Pagamento: PagSeguro para processamento de transações online.
 
 API de Autenticação: OAuth, Firebase Auth para segurança no login de usuários.
 
