@@ -1,3 +1,4 @@
+
 Quando criar branchs use: feat/adicionar-pagina-contato
 fix/corrigir-erro-validacao-email
 chore/atualizar-dependencias-npm
@@ -43,3 +44,4 @@ API de Pagamento: PagSeguro para processamento de transações online.
 API de Autenticação: OAuth, Firebase Auth para segurança no login de usuários.
 
 Outras APIs: Conforme a necessidade do negócio.
+
