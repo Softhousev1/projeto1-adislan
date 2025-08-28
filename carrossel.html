@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Checkout + Slides</title>
+    <style>
+      /* reset css */
+      * {box-sizing: border-box; margin: 0; padding: 0;}
+      body {font-family: Arial, sans-serif; background-color: #ffffff; max-width: 100%; width: 100%;}
+
+      .top {background-color: #ac7171; color: rgb(12, 11, 11); padding: 10px; height: 120px; width: 100%; text-align: center; position: fixed; top: 0; z-index: 1000;}
+
+      nav ul {list-style: none; padding: 20px; margin: 0; display: flex; justify-content: center;}
+      nav ul li {margin: 0 15px; color: #110d0d;}
+      nav a {text-decoration: none; color: #110d0d;}
+      a:hover {text-decoration: underline; color: #470404;}
+
+      input[type="text"] {padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 400px;}
+      button {padding: 10px 20px; background-color: #0f1eec; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;}
+
+      .caixona {background-color: rgb(108, 187, 183); height: auto; display: flex; gap: 20px; margin: 15px; padding-top:140px;}
+      .caixa1 {background-color: rgb(255, 251, 251); padding: 50px; border-radius: 5px; width: 100%;}
+
+      footer {background-color: #ac7171; color: rgb(12, 11, 11); text-align: center; padding: 50px; position: relative; bottom: 0; width: 100%; max-width: 100%;}
+
+      /* slides */
+      :root { --bg: #0f172a; --fg: #e2e8f0; --muted:#94a3b8; }
+      .deck{max-width:980px;margin:20px auto;padding:32px}
+      .frame{position:relative;aspect-ratio:16/9;width:100%;border-radius:16px;overflow:hidden;background:#111827;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+      .slide{position:absolute;inset:0;display:none;align-items:center;justify-content:center}
+      .slide.active{display:flex}
+      .slide img{max-width:100%;max-height:100%;object-fit:contain}
+      .caption{position:absolute;left:12px;bottom:12px;background:rgba(2,6,23,.55);backdrop-filter:blur(6px);padding:10px 14px;border-radius:12px;font-size:14px;color:var(--fg)}
+      .controls{display:flex;gap:12px;justify-content:center;align-items:center;margin-top:14px}
+      .controls button{border:0;padding:10px 14px;border-radius:999px;cursor:pointer;background:#1f2937;color:#e5e7eb;font-weight:600;box-shadow:0 6px 16px rgba(0,0,0,.25)}
+      .controls button:hover{filter:brightness(1.1)}
+      .dots{display:flex;gap:8px;margin-left:8px}
+      .dot{width:8px;height:8px;border-radius:999px;background:#374151;opacity:.6}
+      .dot.active{opacity:1;background:#e5e7eb}
+    </style>
+  </head>
+  <body>
+    <div class="top">  
+      <nav>
+        <ul>
+          <li><a href="iniciar">Início</a></li>
+          <li><a href="sobre">Sobre</a></li>
+          <li><a href="contato">Contato</a></li>
+          <li><a href="cadastro">Cadastro</a></li>
+        </ul>
+      </nav>
+      <input type="text" placeholder="Pesquisar...">
+      <button>Pesquisar</button>
+    </div>  
+
+    <div class="caixona">
+      <div class="caixa1">
+        <h1>Produtos e serviços</h1>
+        <p>Exemplos de produtos com imagens e descrição</p>
+
+        <!-- SLIDES INSERIDOS AQUI -->
+        <div class="deck">
+          <div class="frame" id="deck">
+            <!-- SLIDE 1 – imagem pedida -->
+            <section class="slide active" data-title="Vitrine colorida">
+              <img alt="Arara de roupas com peças azuis e vermelhas" src="como-decorar-uma-loja-de-roupas-e1522869386918.jpg" />
+              <div class="caption">Coleção – destaque de vitrine</div>
+            </section>
+
+            <!-- SLIDE 2 -->
+            <section class="slide" data-title="Promoções da Semana" style="padding:7vw; text-align:center">
+              <div>
+                <h1 style="margin:0 0 12px 0; font-size:4vw; line-height:1">Promoções da Semana</h1>
+                <p style="font-size:1.5vw; color:var(--muted)">Peças selecionadas com até 40% OFF</p>
+              </div>
+            </section>
+
+            <!-- SLIDE 3 -->
+            <section class="slide" data-title="Siga a Loja" style="display:flex;align-items:center;justify-content:center">
+            </section>
+          </div>
+          <div class="controls">
+            <button id="prev" aria-label="Slide anterior">⟵</button>
+            <div class="dots" id="dots" aria-hidden="true"></div>
+            <button id="next" aria-label="Próximo slide">⟶</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>&copy; 2025 Todos os direitos reservados.</p>
+      <p>Email: contato@exemplo.com</p>
+      <p>Telefone: (11) 1234-5678</p>
+      <p>Pagamento: Cartão de Crédito</p>
+    </footer>
+
+    <script>
+      const deck = document.getElementById('deck');
+      const slides = Array.from(deck.querySelectorAll('.slide'));
+      const nextBtn = document.getElementById('next');
+      const prevBtn = document.getElementById('prev');
+      const dotsWrap = document.getElementById('dots');
+
+      let i = 0;
+      const update = () => {
+        slides.forEach((s, idx)=> s.classList.toggle('active', idx===i));
+        dotsWrap.querySelectorAll('.dot').forEach((d, idx)=> d.classList.toggle('active', idx===i));
+        document.title = 'Slide: ' + (slides[i].dataset.title || (i+1));
+      }
+
+      // dots
+      slides.forEach((_, idx) => {
+        const d = document.createElement('div');
+        d.className = 'dot' + (idx===0?' active':'');
+        d.addEventListener('click', ()=>{ i = idx; update(); });
+        dotsWrap.appendChild(d);
+      });
+
+      nextBtn.addEventListener('click', ()=>{ i = (i+1) % slides.length; update(); });
+      prevBtn.addEventListener('click', ()=>{ i = (i-1+slides.length) % slides.length; update(); });
+
+      addEventListener('keydown', (e)=>{
+        if(e.key==='ArrowRight' || e.key==='PageDown' || e.key===' ') { i = (i+1) % slides.length; update(); }
+        if(e.key==='ArrowLeft'  || e.key==='PageUp' ) { i = (i-1+slides.length) % slides.length; update(); }
+      });
+
+      let auto = setInterval(()=>{ i = (i+1) % slides.length; update(); }, 6000);
+      deck.addEventListener('mouseenter', ()=> clearInterval(auto));
+    </script>
+  </body>
+</html>
