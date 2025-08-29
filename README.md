@@ -46,6 +46,3 @@ API de Autenticação: OAuth, Firebase Auth para segurança no login de usuário
 Outras APIs: Conforme a necessidade do negócio.
 
 nome da loja : moda online
-equipe simone
-equipe
-adislam
