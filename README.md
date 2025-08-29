@@ -55,7 +55,6 @@ nome da loja : moda online
 
 Equipe:
 
-
 Erick
 
 Adislan
