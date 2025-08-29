@@ -3,28 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>Document</title>
+    
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
         *{
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-        :root{
-            --cor-fundo: 
-
+            font-family: montserrat, sans-serif;
         }
         body{
             width: 100vw;
             height: 100vh;
-            background-color: #ffffff;
+            background: linear-gradient(#3180b4,#5c7792 ,#5c7792a2,#3180b4);
             display: flex;
             justify-content: center;
             align-items: center;
         }
         .card{
-            background-color:#ac7171;
+            /* background-color:#ac7171; */
+            background: linear-gradient(#3180b4,#243c4d);
             width: 50%;
             height: 65%;
             padding: 2rem;
@@ -64,6 +65,7 @@
             outline: none;
         }
         button{
+            background-color: #097dca;
             width: 100%;
             padding: 0.8rem 5rem;
             border: none;
@@ -74,12 +76,20 @@
             cursor: pointer;
         }
         button:hover{
-            transition: background-color 0.5s;
-            background-color: #f8e2e2;;
+            transition: background-color 0.2s;
+            background-color: #0e193680;
+            box-shadow: 0px 0px 8px #039eff;
         }
         a{
             text-decoration: none;
-            color: black;
+            color: rgb(255, 255, 255);
+        }
+        h1{
+            color: #dbdee7;
+        }
+        label{
+            color:rgb(214, 219, 228);
+            font-size: 0.8rem;
         }
     </style>
 </head>
