@@ -49,3 +49,8 @@ nome da loja : moda online
 
 Equipe:
 Thalya Hadassa
+Erick
+Adislan
+Cesar
+Simone
+Rafael
