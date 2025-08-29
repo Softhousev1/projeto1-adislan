@@ -47,6 +47,10 @@ Outras APIs: Conforme a necessidade do negócio.
 
 nome da loja : moda online
 
+
+
+simone
+
 Equipe:
 
 
