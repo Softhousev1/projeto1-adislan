@@ -47,22 +47,11 @@ Outras APIs: Conforme a necessidade do negócio.
 
 nome da loja : moda online
  
-
-
-
-
-
-
 Equipe:
-
 Erick
-
 Adislan
-
 Cesar
-
 Simone
-
 Rafael
 
 
