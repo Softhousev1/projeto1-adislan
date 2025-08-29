@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Login para github</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #ffffff;
+      text-align: center;
+    }
+    .caixa {
+      background: rgb(245, 245, 245);
+      border: 1px solid rgb(0, 0, 0);
+      width: 350px;
+      margin: 100px auto;
+      padding: 10px;
+      border-radius: 20px; /* borda arredondada */
+    }
+    h2 {
+      margin-top: 0;
+    }
+    input {
+      width: 90%;
+      padding: 8px;
+      margin: 8px 0;
+      border: 1px solid #000000;
+      border-radius: 12px; /* borda arredondada */
+    }
+    button {
+      width: 95%;
+      padding: 10px;
+      margin: 5px 0;
+      background: rgb(255, 0, 0);
+      color: rgb(255, 255, 255);
+      border: none;
+      cursor: pointer;
+      border-radius: 12px; /* borda arredondada */
+    }
+    button:hover {
+      background: rgb(255, 82, 82);
+    }
+    .link {
+      display: block;
+      margin: 5px 0;
+      font-size: 14px;
+      border-radius: 8px; /* opcional, caso queira links arredondados */
+    }
+      .google-btn {
+    background: #fff;
+    color: #000;
+    border: 1px solid gray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border-radius: 12px;
+    width: 95%;
+    padding: 10px;
+    margin: 2px 0;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+  }
+  .google-btn img {
+    width: 20px;
+    height: 20px;
+  }
+  </style>
+</head>
+<body>
+  <div class="caixa">
+    <h2>Que bom ter você aqui!</h2>
+    <p>Entre e aproveite o melhor do (nome do site).</p>
+    <input type="text" placeholder="CPF, CNPJ ou e-mail"><br>
+    <input type="password" placeholder="Senha"><br>
+    <a href="#" class="link">Esqueci minha senha</a>
+    <button>Entrar</button>
+    <button style="background:rgb(255, 255, 255);color:rgb(0, 0, 0);border:1px solid gray; border-radius:12px;">Criar conta em (sla)</button>
+    <p>ou</p>
+    <center><button class="google-btn">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+      Entrar com Google
+    </button></center>
+    <a href="#" class="link">Preciso de ajuda</a>
+  </div>
