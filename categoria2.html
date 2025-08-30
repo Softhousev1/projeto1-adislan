@@ -18,10 +18,11 @@
         background-color: #ffffff;
         max-width: 100%;
         width: 100%;
+         overflow-x: hidden; 
     }
     .top {
-        background-color: #ac7171;
-        color: rgb(12, 11, 11);
+        background-color: #b96464;
+        color: rgb(0, 0, 0);
         padding: 10px;
         height: 120px;
         width: 100%;
@@ -43,7 +44,7 @@
     }
     nav ul li {
         margin: 0 15px;
-        color: #110d0d;
+        color: #000000;
     }
     input[type="text"] {
         padding: 10px;
@@ -70,7 +71,7 @@
         color: #470404;
     }
 
-footer {
+    footer {
    background-color: #ac7171;
    color: rgb(12, 11, 11);
    text-align: center;
@@ -80,7 +81,7 @@ footer {
    width: 100%;
    max-width: 100%;
 }
-.categorias {
+    .categorias {
     display: flex;
     flex-direction: column;
     background-color: rgb(138, 138, 138);
@@ -93,25 +94,19 @@ footer {
 
 }
 
-img {
+    img {
     background-color: #110d0d;
     max-width: max-content;
     text-align: center;
 }
-p{
+    .mt-2p{
     background-color: #505050;
     max-width: fit-content;
     width: max-content;
+    text-align: center;
 
 }
-.produto{
-    background-color: #d91212;
-    border-radius: 16px;
-    padding: 10px;
-    /* margin: 10px; */
-    width:300px;
-    border: 2px solid black;
-}
+
 
 </style>
 <body>
@@ -131,50 +126,49 @@ p{
             <button>Pesquisar</button>
         </div>  
         <!-- aqui termina o menu -->
-           
-            <!-- Aqui começa todo o conteudo principal -->
-<div class="categorias">
-    <div class="container text-center">
-        <div class="row row-cols-5">
-                 <div class="col">
-                    <div class="produto">
-                        <img src="./IMG/Moletom/masculino/Moletom M (1).png" alt=""width="250px" height="250px">
-                        <p>Moletom preto e branco com letra N</p>
-                        <p>R$:189,99</p>
+        <!-- Aqui começa todo o conteudo principal -->
+        <div class="container my-5"></div>
+            <div class="categorias py-4" style="height:auto;">
+                <div class="row justify-content-center g-4 style">
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <div class="produto text-center p-2 bg-white rounded shadow-sm h-100">
+                            <img src="./IMG/Moletom/masculino/Moletom M (1).png" alt="Produto 1" class="img-fluid rounded" style="width:220px; height:220px; object-fit:cover;">
+                            <p class="mt-2">Moletom branco e preto letra N</p>
+                            <p class="mt-2">R$:189,99</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <div class="produto text-center p-2 bg-white rounded shadow-sm h-100">
+                            <img src="./IMG/Moletom/masculino/Moletom M (2).png" alt="Produto 2" class="img-fluid rounded" style="width:220px; height:220px; object-fit:cover;">
+                            <p class="mt-2">Moletom branco e preto com capus</p>
+                            <p class="mt-2"><R1:169></R1:169>,99</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <div class="produto text-center p-2 bg-white rounded shadow-sm h-100">
+                            <img src="./IMG/Moletom/masculino/Moletom M (3).png" alt="Produto 3" class="img-fluid rounded" style="width:220px; height:220px; object-fit:cover;">
+                            <p class="mt-2">Moletom full black Nike</p>
+                            <p class="mt-2">R$:219,99</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <div class="produto text-center p-2 bg-white rounded shadow-sm h-100">
+                            <img src="./IMG/Moletom/masculino/Moletom M (4).png" alt="Produto 4" class="img-fluid rounded" style="width:220px; height:220px; object-fit:cover;">
+                            <p class="mt-2">Moletom Adidas preto e branco</p>
+                            <p class="mt-2">R$:229,99</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <div class="produto text-center p-2 bg-white rounded shadow-sm h-100">
+                            <img src="./IMG/Moletom/masculino/Moletom M (5).png" alt="Produto 5" class="img-fluid rounded" style="width:220px; height:220px; object-fit:cover;">
+                            <p class="mt-2">Moletom cinza escuro comun</p>
+                            <p class="mt-2">R$:139,99</p>
+                        </div>
                     </div>
                 </div>
-                <div class="col"> 
-                    <div class="produto">
-                        <img src="./IMG/Moletom/masculino/Moletom M (2).png" alt=""width="250px" height="250px">
-                        <p>moletom preto e branco</p>
-                        <p>R$:149,99</p>
-                    </div>
-                </div>
-                <div class="col">
-                     <div class="produto">
-                        <img src="./IMG/Moletom/masculino/Moletom M (3).png" alt="width="200px" height="200px">
-                        <p>moleton full black</p>
-                        <p>R$:139,99</p>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="produto">
-                        <img src="./IMG/Moletom/masculino/Moletom M (4).png" alt="width="200px" height="200px">
-                        <p>moletom da Adidas</p>
-                        <p>R$:229,99</p>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="produto">
-                        <img src="./IMG/Moletom/masculino/Moletom M (5).png" alt="width"200px" height="200px" >
-                        <p>moletom cinza comun</p>
-                        <p>R$:119,99</p>
-                    </div>
-                </div>
-      </div>
-    </div>             
-</div>
+            </div>
         </div>
+    
    <footer>
        <p>
         &copy; 2025 Todos os direitos reservados.
