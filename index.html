@@ -4,59 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Checkout + Slides</title>
-    <style>
-      /* reset css */
-      * {box-sizing: border-box; margin: 0; padding: 0;}
-      body {font-family: Arial, sans-serif; background-color: #5a6c7a; max-width: 100%; width: 100%;}
-/*CORES DO TOPO MENU*/
-      .top {background: linear-gradient(to bottom, #2b709e, #5a6c7a); color: rgb(12, 11, 11); padding: 10px; height: 120px; width: 100%; text-align: center; position: fixed; top: 0; z-index: 1000;}
-
-      nav ul {list-style: none; padding: 20px; margin: 0; display: flex; justify-content: center;}
-      nav ul li {margin: 0 15px; color: #110d0d;}
-      nav a {text-decoration: none; color: #f0ebeb;}
-      a:hover {text-decoration: underline; color: #73c5eb;}
-
-      input[type="text"] {padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 400px;}
-      button {padding: 10px 20px;
-        box-shadow: 2px 2px 5px rgb(60, 67, 77);
-
-         background-color: #063866; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;}
-/*CORES DO TOPO MENU*/
-      .caixa1 {background-color: #5a6c7a; padding: 50px; border-radius: 5px; width: 100%;}
-
-      footer {background: linear-gradient(to bottom,#5a6c7a, #2b709e); color: rgb(12, 11, 11); text-align: center; padding: 50px; position: relative; bottom: 0; width: 100%; max-width: 100%;}
-
-.icones {
-        display: flex;
-        justify-content: center;
-        margin-top: 2px ;
-        gap: 10px;
-
-
-    }
-    .logo {
-      font-size: 24px;
-      font-weight: bold;
-      color: #f0ebeb;
-      margin-right:100000px
-    }
-
-      /* slides css*/
-
-      :root { --bg: #0f172a; --fg: #e2e8f0; --muted:#94a3b8; }
-      .deck{max-width:980px;margin:20px auto;padding:32px}
-      .frame{position:relative;aspect-ratio:16/9;width:100%;border-radius:16px;overflow:hidden;background:#111827;box-shadow:0 10px 30px rgba(0,0,0,.35)}
-      .slide{position:absolute;inset:0;display:none;align-items:center;justify-content:center}
-      .slide.active{display:flex}
-      .slide img{max-width:100%;max-height:100%;object-fit:contain}
-      .caption{position:absolute;left:12px;bottom:12px;background:rgba(2,6,23,.55);backdrop-filter:blur(6px);padding:10px 14px;border-radius:12px;font-size:14px;color:var(--fg)}
-      .controls{display:flex;gap:12px;justify-content:center;align-items:center;margin-top:14px}
-      .controls button{border:0;padding:10px 14px;border-radius:999px;cursor:pointer;background:#1f2937;color:#e5e7eb;font-weight:600;box-shadow:0 6px 16px rgba(0,0,0,.25)}
-      .controls button:hover{filter:brightness(1.1)}
-      .dots{display:flex;gap:8px;margin-left:8px}
-      .dot{width:8px;height:8px;border-radius:999px;background:#374151;opacity:.6}
-      .dot.active{opacity:1;background:#e5e7eb}
-    </style>
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
 <!-- Menu superior -->
@@ -65,20 +13,20 @@
       
       <nav>
         <ul>
-          <li><a href="iniciar">Início</a></li>
-          <li><a href="sobre">Sobre</a></li>
-          <li><a href="contato">Contato</a></li>
-          <li><a href="cadastro">Cadastro</a></li>
-     
+          <li><a href="#">Início</a></li>
+          <li><a href="#">Sobre</a></li>
+          <li><a href="./contato.html">Contato</a></li>
+          <li><a href="./cadastro.html">Cadastro</a></li>
+
       <input type="text" placeholder="Pesquisar...">
-      <button>Pesquisar</button>
+      <button id="botao-pesquisar">Pesquisar</button>
        </ul>
       </nav>
     </div>  
     <!-- Menu superior -->
 
     <!-- Conteudo -->
-    <div class="caixona">
+   
       <div class="caixa1">
         <h1>Produtos e serviços</h1>
         <p>Exemplos de produtos com imagens e descrição</p>
@@ -111,7 +59,7 @@
           </div>
         </div>
       </div>
-    </div>
+   
 <!-- Rodapé -->
     <footer>
       <div class="icones"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-facebook" viewBox="0 0 16 16">
