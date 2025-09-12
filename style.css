@@ -8,7 +8,25 @@
         }
     
     }
+    /* Espaçamento entre menu/topo e conteúdo principal */
+    body {
+      padding-top: 140px;
+    }
 
+    /* Ajusta o espaçamento do conteúdo principal */
+    .caixa1 {
+      margin-top: 30px;
+    }
+
+    /* Espaçamento extra abaixo do menu superior */
+    .top {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    /* Espaçamento entre o formulário de pesquisa e os slides */
+    .deck {
+      margin-top: 40px;
+    }
     /* Aqui é a pagina do menu principal Index */
       body {font-family: Arial, sans-serif; background-color: #5a6c7a; max-width: 100%; width: 100%;}
 
