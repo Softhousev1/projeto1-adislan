@@ -7,8 +7,9 @@
         }
     
     }
+    html
 
-    /* Aqui é a pagina do menu principal Index */
+    /* Aqui é a pagina do menu principal Inde.html */
     .logo {
         width: 150px;
         height: auto;
@@ -89,11 +90,12 @@
     #icone-login img {
       width: 30px;
       height: 30px;
+
     }
 
 /* MENU */
 
-
+ 
 /* Rodapé */
       footer {background: linear-gradient(to bottom,#5a6c7a, #2b709e); color: rgb(12, 11, 11); text-align: center; padding: 50px; position: relative; bottom: 0; width: 100%; max-width: 100%;}
 
