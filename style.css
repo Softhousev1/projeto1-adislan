@@ -10,21 +10,27 @@
     html
 
     /* Aqui é a pagina do menu principal Inde.html */
-    .logo {
+    /* .logo {
         width: 150px;
-        height: auto;
-        font-family: Arial, sans-serif;
-    ;
-
-      }
-      .logo img {
         
-        display: flex;
-        margin-left: -550px; /* move para a esquerda */
-        margin-top: -20px;  /* move para cima */
-        width: 180%;
-        height: auto;
+        font-family: Arial, sans-serif;
+    ; */
+
+      
+      .logo img {
+
+      position: fixed;
+  top: 0px;
+  left: 0px; /* Em vez de right */
+  z-index: 100;
+  max-width: 100%
+
+text-align :left;
+      
       }
+
+
+      
       body {font-family: Arial, sans-serif; background-color: #5a6c7a; max-width: 100%; width: 100%;}
 
         /* MENU*/
