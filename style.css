@@ -456,6 +456,87 @@ body {
 }
 /* FIM DO NOVO CARROSSEL */
 
+/* --- PÁGINA DE CADASTRO --- */
+.cadastro-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px; /* Espaçamento vertical e horizontal */
+    background-color: #5a6c7a; /* Mantém o fundo da página */
+}
+
+/* O card da página de cadastro - sobrescrevendo o estilo genérico */
+.cadastro-container .card {
+    background: linear-gradient(#3180b4, #243c4d);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+    color: white;
+    width: 100%;
+    max-width: 500px; /* Limita a largura máxima em telas grandes */
+    margin: 20px 0;
+}
+
+.cadastro-container .card h1 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #dbdee7;
+}
+
+.cadastro-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Espaço entre os grupos de formulário */
+}
+
+.cadastro-container .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.cadastro-container label {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #d6dbe4;
+}
+
+.cadastro-container input {
+    padding: 0.8rem;
+    border-radius: 5px;
+    border: 1px solid #5a6c7a;
+    background-color: #f0f2f5;
+    outline: none;
+    width: 100%; /* Ocupa toda a largura disponível */
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.cadastro-container input:focus {
+    border-color: #73c5eb;
+    box-shadow: 0 0 5px rgba(115, 197, 235, 0.5);
+}
+
+.cadastro-container button[type="submit"] {
+    background-color: #097dca;
+    color: white;
+    width: 100%;
+    padding: 0.8rem;
+    border: none;
+    font-size: 1.1rem;
+    font-weight: 500;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-top: 1rem; /* Espaço acima do botão */
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.cadastro-container button[type="submit"]:hover {
+    background-color: #0e1936;
+    box-shadow: 0 0 8px #039eff;
+}
+/* FIM DA PÁGINA DE CADASTRO */
+
+
 /* Rodapé */
 footer {background: linear-gradient(to bottom,#5a6c7a, #2b709e); color: rgb(12, 11, 11); text-align: center; padding: 50px; position: relative; bottom: 0; width: 100%; max-width: 100%;}
    
