@@ -8,35 +8,48 @@
   </head>
   <body>
 <!-- Menu superior -->
-    <div class="top"> 
-    <div class="logo">MODA ONLINE</div>
-      
-      <nav>
-        <ul>
-          <li><a href="#">Início</a></li>
-          <li><a href="#">Sobre</a></li>
-          <li><a href="./contato.html">Contato</a></li>
-          <li><a href="./cadastro.html">Cadastro</a></li>
+<header class="main-header">
+    <div class="logo">
+        <a href="./index.html"><img src="./img/download.svg" alt="Logo da Empresa"></a>
+    </div>
 
-      <input type="text" placeholder="Pesquisar...">
-      <button id="botao-pesquisar">Pesquisar</button>
-       </ul>
-      </nav>
-    </div>  
-    <!-- Menu superior -->
+    <nav class="main-nav">
+        <ul>
+            <li><a href="#">Início</a></li>
+            <li><a href="./sobreosite.html">Sobre</a></li>
+        </ul>
+    </nav>
+
+    <div class="search-bar">
+        <input type="text" placeholder="Pesquisar...">
+        <button id="botao-pesquisar">Pesquisar</button>
+    </div>
+
+    <div class="user-icons">
+        <a href="./login.html" class="icon-link">
+            <img src="./img/icons/login.png" alt="Ícone de Login">
+            <span>Login</span>
+        </a>
+  <a href="./carrinho.html" class="icon-link" id="carrinho-link">
+      <img src="./img/carrinho-icone.png" alt="Ícone de Carrinho">
+      <span>Carrinho <span id="carrinho-contador" style="background:#e74c3c;color:#fff;border-radius:50%;padding:2px 8px;font-size:0.9em;margin-left:2px;min-width:22px;display:inline-block;text-align:center;">0</span></span>
+    </a>
+    </div>
+
+    
+</header>
+<!-- Menu superior -->
 
     <!-- Conteudo -->
    
       <div class="caixa1">
-        <h1>Produtos e serviços</h1>
-        <p>Exemplos de produtos com imagens e descrição</p>
-
+       
         <!-- SLIDES INSERIDOS AQUI -->
         <div class="deck">
           <div class="frame" id="deck">
             <!-- SLIDE 1 – imagem pedida -->
             <section class="slide active" data-title="Vitrine colorida">
-              <img alt="Arara de roupas com peças azuis e vermelhas" src="como-decorar-uma-loja-de-roupas-e1522869386918.jpg" />
+              <img alt="Arara de roupas com peças azuis e vermelhas" src="./img/Calças/a6d81dc2ae38d79ca5557876d4242ace.webp" />
               <div class="caption">Coleção – destaque de vitrine</div>
             </section>
 
@@ -59,7 +72,49 @@
           </div>
         </div>
       </div>
+      <!-- Produtos  -->
+      <div class="produtos">
+        <div class="produto"> 
+          <img src="img/Blusas/Camisa M (4).png" alt="Calça ">
+          <h3>camisa masculina</h3> 
+          <p>R$ 100,00</p>
+          <button class="btn-comprar">Comprar</button>
+        </div>
+        <div class="produto">
+          <img src="img/Calças/Calças M (3).png" alt="Calça Masculina">
+          <h3>calça masculina</h3>
+          <p>R$ 150,00</p>
+          <button class="btn-comprar">Comprar</button>
+        </div>
+        <div class="produto">
+          <img src="img/Calças/Calças F (4).png" alt="Calça Feminina">
+          <h3>calça feminina</h3>
+          <p>R$ 150,00</p>
+          <button class="btn-comprar">Comprar</button>
+        </div>
+        <div class="produto">
+          <img src="img/Blusas/Camisa F (4).png" alt="Camisa Feminina">
+          <h3>camisa feminina</h3>
+          <p>R$ 130,00</p>
+          <button class="btn-comprar">Comprar</button>
+        </div>
+        <div class="produto">
+          <img src="img/Tênis/Sapato M (3).png" alt="Tênis Casual">
+          <h3>tênis casual</h3>
+          <p>R$ 120,00</p>
+          <button class="btn-comprar">Comprar</button>
+        </div>
+        <div class="produto">
+          <img src="img/Tênis/Sapato M (5).png" alt="Tênis Masculino">
+          <h3>tênis masculino</h3>
+          <p>R$ 180,00</p>
+          <button class="btn-comprar">Comprar</button>
+        </div>
+        
+      </div>
    
+    
+
 <!-- Rodapé -->
     <footer>
       <div class="icones"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-facebook" viewBox="0 0 16 16">
@@ -110,6 +165,30 @@
 
       let auto = setInterval(()=>{ i = (i+1) % slides.length; update(); }, 6000);
       deck.addEventListener('mouseenter', ()=> clearInterval(auto));
+
+      // Carrinho de compras - contador e produtos
+      const contador = document.getElementById('carrinho-contador');
+      // Carregar quantidade do carrinho do localStorage
+      function atualizarContador() {
+        const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+        contador.textContent = carrinho.length;
+      }
+      atualizarContador();
+
+      document.querySelectorAll('.produto').forEach(produtoDiv => {
+        const btn = produtoDiv.querySelector('.btn-comprar');
+        btn.addEventListener('click', function() {
+          // Obter dados do produto
+          const nome = produtoDiv.querySelector('h3').textContent.trim();
+          const preco = produtoDiv.querySelector('p').textContent.replace('R$','').trim();
+          const img = produtoDiv.querySelector('img').getAttribute('src');
+          // Adicionar ao carrinho
+          let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+          carrinho.push({ nome, preco, img });
+          localStorage.setItem('carrinho', JSON.stringify(carrinho));
+          atualizarContador();
+        });
+      });
     </script>
   </body>
 </html>

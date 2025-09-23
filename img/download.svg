@@ -1,0 +1,9 @@
+<svg width="300" height="120" viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="transparent"></rect>
+  <text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="32" fill="white">
+    Moda
+  </text>
+  <text x="50%" y="75%" dominant-baseline="middle" text-anchor="middle" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="28" fill="white">
+    Online
+  </text>
+</svg>

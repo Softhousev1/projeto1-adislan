@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página de Perfil</title>
+  <style>
+    /* ====== ESTILOS GERAIS ====== */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      width: 420px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+      padding: 30px 55px;
+      animation: fadeIn 0.8s ease-in-out;
+      text-align: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      color: #1e3c72;
+      margin-bottom: 25px;
+    }
+
+    /* ====== AVATAR ====== */
+    .avatar-container {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 25px;
+    }
+
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 4px solid #2a5298;
+      object-fit: cover;
+    }
+
+    .upload-btn {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+      background: #2a5298;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s;
+    }
+
+    .upload-btn:hover {
+      background: #1e3c72;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    /* ====== FORM ====== */
+    form {
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      margin-top: 18px;
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: #2a5298;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #cfd8e3;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      margin-bottom: 12px;
+    }
+
+    input:focus {
+      border-color: #1e3c72;
+      box-shadow: 0 0 6px rgba(30,60,114,0.4);
+      outline: none;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 14px;
+      margin-top: 20px;
+      background: linear-gradient(90deg, #1e3c72, #2a5298);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.3s;
+    }
+
+    button[type="submit"]:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+    }
+
+    .msg {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .success {
+      color: #1e7c3c;
+    }
+
+    .error {
+      color: #b00020;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Perfil do Usuário</h2>
+
+    <!-- Avatar -->
+    <div class="avatar-container">
+      <img src="https://via.placeholder.com/120" alt="Avatar" class="avatar" id="preview">
+      <label for="fileInput" class="upload-btn">📷</label>
+      <input type="file" id="fileInput" accept="image/*">
+    </div>
+
+    <!-- Formulário -->
+    <form id="profileForm">
+      <label for="nome">Nome</label>
+      <input type="text" id="nome" placeholder="Digite seu nome" required>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="Digite seu email" required>
+
+      <label for="senha">Senha</label>
+      <input type="password" id="senha" placeholder="Digite sua senha" required>
+
+      <label for="endereco">Endereço</label>
+      <input type="text" id="endereco" placeholder="Digite seu endereço">
+
+      <label for="telefone">Telefone</label>
+      <input type="tel" id="telefone" placeholder="(99) 99999-9999">
+
+      <button type="submit">💾 Salvar Alterações</button>
+      <div class="msg" id="mensagem"></div>
+    </form>
+  </div>
+
+  <script>
+    // Preview da foto de perfil
+    const fileInput = document.getElementById('fileInput');
+    const preview = document.getElementById('preview');
+
+    fileInput.addEventListener('change', function() {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Validação do formulário
+    const form = document.getElementById('profileForm');
+    const mensagem = document.getElementById('mensagem');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const nome = document.getElementById('nome').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const senha = document.getElementById('senha').value.trim();
+      const telefone = document.getElementById('telefone').value.trim();
+
+      if (nome === "" || email === "" || senha === "") {
+        mensagem.textContent = "Preencha todos os campos obrigatórios!";
+        mensagem.className = "msg error";
+        return;
+      }
+
+      if (telefone && !/^\(\d{2}\) \d{4,5}-\d{4}$/.test(telefone)) {
+        mensagem.textContent = "Telefone deve estar no formato (99) 99999-9999";
+        mensagem.className = "msg error";
+        return;
+      }
+
+      mensagem.textContent = "✔️ Alterações salvas com sucesso!";
+      mensagem.className = "msg success";
+    });
+  </script>
+</body>
+</html>
