@@ -40,36 +40,35 @@
 
     <!-- Conteudo -->
    
-      <div class="caixa1">
-       
-        <!-- SLIDES INSERIDOS AQUI -->
-        <div class="deck">
-          <div class="frame" id="deck">
-            <!-- SLIDE 1 – imagem pedida -->
-            <section class="slide active" data-title="Vitrine colorida">
-              <img alt="Arara de roupas com peças azuis e vermelhas" src="./img/Calças/a6d81dc2ae38d79ca5557876d4242ace.webp" />
-              <div class="caption">Coleção – destaque de vitrine</div>
+    <div class="caixa1">
+      <!-- SLIDES INSERIDOS AQUI -->
+      <div class="deck">
+        <div class="frame">
+          <div class="slides-wrapper" id="slidesWrapper">
+            <!-- SLIDE 1 -->
+            <section class="slide">
+              <img src="./img/redimencionado/redimensionada_Sapato M (3).png" alt="Sapato Masculino" />
             </section>
 
             <!-- SLIDE 2 -->
-            <section class="slide" data-title="Promoções da Semana" style="padding:7vw; text-align:center">
-              <div>
-                <h1 style="margin:0 0 12px 0; font-size:4vw; line-height:1">Promoções da Semana</h1>
-                <p style="font-size:1.5vw; color:var(--muted)">Peças selecionadas com até 40% OFF</p>
-              </div>
+            <section class="slide">
+              <img src="./img/redimencionado/redimensionada_Moletom M (4).png" alt="Moletom Masculino" />
             </section>
 
             <!-- SLIDE 3 -->
-            <section class="slide" data-title="Siga a Loja" style="display:flex;align-items:center;justify-content:center">
+            <section class="slide">
+              <img src="./img/redimencionado/redimensionada_Camisa F (4).png " alt="Camisa Feminina" />
             </section>
           </div>
-          <div class="controls">
-            <button id="prev" aria-label="Slide anterior">⟵</button>
-            <div class="dots" id="dots" aria-hidden="true"></div>
-            <button id="next" aria-label="Próximo slide">⟶</button>
-          </div>
+        </div>
+
+        <div class="controls">
+          <button id="prev" aria-label="Slide anterior">⟵</button>
+          <div class="dots" id="dots"></div>
+          <button id="next" aria-label="Próximo slide">⟶</button>
         </div>
       </div>
+    </div>
       <!-- Produtos  -->
       <div class="produtos">
         <div class="produto"> 
@@ -132,37 +131,58 @@
     </footer>
 
     <script>
-      const deck = document.getElementById('deck');
-      const slides = Array.from(deck.querySelectorAll('.slide'));
+      // --- LÓGICA DO NOVO CARROSSEL ---
+      const slidesWrapper = document.getElementById('slidesWrapper');
+      const slides = Array.from(slidesWrapper.querySelectorAll('.slide'));
       const nextBtn = document.getElementById('next');
       const prevBtn = document.getElementById('prev');
-      const dotsWrap = document.getElementById('dots');
+      const dotsContainer = document.getElementById('dots');
 
-      let i = 0;
-      const update = () => {
-        slides.forEach((s, idx)=> s.classList.toggle('active', idx===i));
-        dotsWrap.querySelectorAll('.dot').forEach((d, idx)=> d.classList.toggle('active', idx===i));
-        document.title = 'Slide: ' + (slides[i].dataset.title || (i+1));
+      let currentIndex = 0;
+      const totalSlides = slides.length;
+
+      // Criar os dots
+      slides.forEach((_, index) => {
+        const dot = document.createElement('button');
+        dot.classList.add('dot');
+        dot.addEventListener('click', () => {
+          goToSlide(index);
+        });
+        dotsContainer.appendChild(dot);
+      });
+
+      const dots = Array.from(dotsContainer.querySelectorAll('.dot'));
+
+      function updateCarousel() {
+        slidesWrapper.style.transform = `translateX(-${currentIndex * 100}%)`;
+        dots.forEach((dot, index) => {
+          dot.classList.toggle('active', index === currentIndex);
+        });
       }
 
-      // dots
-      slides.forEach((_, idx) => {
-        const d = document.createElement('div');
-        d.className = 'dot' + (idx===0?' active':'');
-        d.addEventListener('click', ()=>{ i = idx; update(); });
-        dotsWrap.appendChild(d);
+      function goToSlide(index) {
+        currentIndex = index;
+        updateCarousel();
+      }
+
+      nextBtn.addEventListener('click', () => {
+        currentIndex = (currentIndex + 1) % totalSlides;
+        updateCarousel();
       });
 
-      nextBtn.addEventListener('click', ()=>{ i = (i+1) % slides.length; update(); });
-      prevBtn.addEventListener('click', ()=>{ i = (i-1+slides.length) % slides.length; update(); });
-
-      addEventListener('keydown', (e)=>{
-        if(e.key==='ArrowRight' || e.key==='PageDown' || e.key===' ') { i = (i+1) % slides.length; update(); }
-        if(e.key==='ArrowLeft'  || e.key==='PageUp' ) { i = (i-1+slides.length) % slides.length; update(); }
+      prevBtn.addEventListener('click', () => {
+        currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+        updateCarousel();
       });
 
-      let auto = setInterval(()=>{ i = (i+1) % slides.length; update(); }, 6000);
-      deck.addEventListener('mouseenter', ()=> clearInterval(auto));
+      // Inicia o carrossel
+      updateCarousel();
+      
+      // Avanço automático
+      let autoSlide = setInterval(() => {
+        nextBtn.click();
+      }, 5000);
+
     </script>
   </body>
 </html>
