@@ -125,121 +125,35 @@
     }
     /* Rodapé */
     
-      /*Conteudo*/
-      .caixa1 {background-color: #5a6c7a; 
-        padding: 50px; border-radius: 5px; width: 100%;}
+      /*Conteudo---------*/
 
-      /* slides css----------------*/
-
-      /* :root { --bg: #0f172a; --fg: #e2e8f0; --muted:#94a3b8; }
-
-      .deck{max-width:980px;
-        margin:20px auto;
-        padding:32px;
-      }
-
-      .frame{position:relative;
-        aspect-ratio:16/9;
-        width:100%;
-        border-radius:16px;
-        overflow:hidden;
-        background:#111827;
-        box-shadow:0 10px 30px rgba(0,0,0,.35);
-      }
-
-      .slide{position:absolute;
-        inset:0;
-        display:none;
-        align-items:center;
-        justify-content:center;
-      }
-      .slide.active{
-        display:flex;
-      }
-      .slide img{
-        max-width:100%;
-        max-height:100%;
-        object-fit:contain;
-      }
-      .caption{
-        position:absolute;
-        left:12px;
-        bottom:12px;
-        background:rgba(2,6,23,.55);
-        backdrop-filter:blur(6px);
-        padding:10px 14px;
-        border-radius:12px;
-        font-size:14px;
-        color:var(--fg);
-      }
-      .controls{
-        display:flex;
-        gap:12px;
-        justify-content:center;
-        align-items:center;
-        margin-top:14px;
-      }
-      .controls button{
-        border:0;
-        padding:10px 14px;
-        border-radius:999px;
-        cursor:pointer;
-        background:#1f2937;
-        color:#e5e7eb;
-        font-weight:600;
-        box-shadow:0 6px 16px rgba(0,0,0,.25);
-      }
-      .controls button:hover{
-        filter:brightness(1.1);
-      }
-      .dots{
-        display:flex;
-        gap:8px;
-        margin-left:8px;
-      }
-      .dot{
-        width:8px;
-        height:8px;
-        border-radius:999px;
-        background:#374151;
-        opacity:.6;
-      }
-      .dot.active{
-        opacity:1;
-        background:#e5e7eb;
-      } */
-
+      /* carrossel_de_fotos-------- */
       .caixa1 {
-        /* background-color: #110d0d; */
         display: flex;
         justify-content: center;
         align-items: center;
-      /* height: 50rem; */
+        height: 50rem;
     }
 
     .deck {
-      /* background-color: chocolate; */
       width: 50%;
       height: auto;
-      max-width: 800px;
+      
       position: relative;
     }
 
     .frame {
-      /* background-color: chartreuse; */
       overflow: hidden;
       width: 100%;
     }
 
     .slides-wrapper {
-      /* background-color: burlywood; */
       display: flex;
       transition: transform 0.5s ease;
       width: 100%;
     }
 
     .slide {
-      /* background-color: cadetblue; */
       min-width: 100%;
       display: flex;
       justify-content: center;
@@ -255,34 +169,19 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      margin-bottom: 1rem;
     }
 
     .controls {
-      /* background-color: blueviolet; */
       display: flex;
-      /* align-items: center; */
-      /* justify-content: space-evenly; */
-      padding-bottom: 3rem;
-      
+      gap: 6rem;
     }
-    /* .controls {
-      position: absolute;
-      top: 50%;
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transform: translateY(-50%);
-      pointer-events: none;
-    } */
-
     .controls button {
       background-color: rgba(0, 0, 0, 0.5);
       color: white;
       border: none;
       padding: 10px;
       cursor: pointer;
-      /* border-radius: 5px; */
       font-size: 20px;
       pointer-events: auto;
     }
