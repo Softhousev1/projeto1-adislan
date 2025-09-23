@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrativo - Login</title>
+  <style>
+    /* Fundo com gradiente */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0a2342 0%, #173a5e 60%, #2c3e50 100%);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Card de login */
+    .login-container {
+      background: linear-gradient(120deg, #0a2342 0%, #173a5e 80%, #2c3e50 100%);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 12px;
+      padding: 40px;
+      width: 350px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+      color: #fff;
+      text-align: center;
+      border: 1.5px solid #173a5e;
+    }
+
+    .login-container h2 {
+      margin: 0 0 10px;
+      font-size: 1.5rem;
+    }
+
+    .login-container p {
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      color: #ddd;
+    }
+
+    .login-container .icon {
+      font-size: 40px;
+      margin-bottom: 15px;
+    }
+
+    /* Inputs */
+    .login-container input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    /* Botão */
+    .login-container button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 6px;
+      background: linear-gradient(90deg, #173a5e 0%, #0a2342 80%, #2c3e50 100%);
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 2px 8px rgba(10,35,66,0.18);
+    }
+
+    .login-container button:hover {
+      opacity: 0.9;
+    }
+
+    /* Texto pequeno */
+    .login-container small {
+      display: block;
+      margin-top: 15px;
+      color: #ffffff;
+      font-size: 0.8rem;
+    }
+
+    .login-container small a {
+      color: #00ccff;
+      text-decoration: none;
+    }
+  </style>
+  <style>
+    .alert {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: fixed;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, #ff0004, #ff0000);
+      color: #fff;
+      padding: 16px 32px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      font-size: 1.05rem;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s, top 0.4s;
+      animation: none;
+    }
+    .alert.show {
+      opacity: 1;
+      pointer-events: auto;
+      top: 50px;
+    }
+    .alert .close-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.3rem;
+      cursor: pointer;
+      margin-left: 8px;
+      transition: color 0.2s;
+    }
+    .alert .close-btn:hover {
+      color: #222;
+    }
+  </style>
+</head>
+<body>
+  <div class="alert" id="alertBox">
+    <span style="font-size:1.3em;">⚠️</span>
+    <span id="alertMsg">Usuário ou senha incorretos!</span>
+    <button class="close-btn" id="closeAlert" title="Fechar">&times;</button>
+  </div>
+  <div class="login-container">
+    <div class="icon">🔒</div>
+    <h2>Painel Administrativo</h2>
+    <p>Faça login para gerenciar seu sistema</p>
+    
+    <form id="loginForm">
+      <input type="text" id="usuario" placeholder="Usuário" required>
+      <input type="password" id="senha" placeholder="Senha" required>
+      <button type="submit">Entrar</button>
+    </form>
+    
+    <small>Credenciais padrão: <b>admin / admin123</b></small>
+  </div>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const user = document.getElementById("usuario").value;
+      const pass = document.getElementById("senha").value;
+
+      if (user === "admin" && pass === "admin123") {
+        alert("Login realizado com sucesso!");
+        // Salva autenticação
+        localStorage.setItem("autenticado", "true");
+        window.location.href = "dashboard.html";
+      } else {
+        // Alerta visual moderno e dinâmico
+        const alertBox = document.getElementById("alertBox");
+        alertBox.classList.add("show");
+        alertBox.style.top = "50px";
+        // Fecha automaticamente após 3s
+        const timeout = setTimeout(() => {
+          alertBox.classList.remove("show");
+        }, 3000);
+        // Permite fechar manualmente
+        document.getElementById("closeAlert").onclick = function() {
+          alertBox.classList.remove("show");
+          clearTimeout(timeout);
+        };
+      }
+    });
+  </script>
+</body>
+</html>
