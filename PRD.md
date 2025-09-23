@@ -1,6 +1,6 @@
 PRD — Loja Online
 
-Visão Geral do Projeto Objetivo: Criar uma loja online para venda de [produtos específicos, ex: roupas. Público-alvo: todos
+Visão Geral do Projeto Objetivo: Criar uma loja online para venda de [produtos específicos, ex: roupas. Público-alvo: Todos
 
 Plataforma: Web (responsiva para mobile), com possibilidade futura de app.
 

@@ -1,3 +1,7 @@
+admin@modaatual.com
+admin123
+
+
 
 Quando criar branchs use: feat/adicionar-pagina-contato
 fix/corrigir-erro-validacao-email

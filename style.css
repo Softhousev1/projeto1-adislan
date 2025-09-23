@@ -1,6 +1,8 @@
 
       /* reset css */
-      * {box-sizing: border-box; margin: 0; padding: 0;
+      * {box-sizing: border-box; 
+        margin: 0;
+         padding: 0;
         a{
             text-decoration: none;
             color: rgb(255, 255, 255);
@@ -210,4 +212,176 @@ text-align :left;
             font-size: 0.8rem;
         }
 
+.produtos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px; /* Espaçamento entre os produtos */
+    padding: 20px;
+    max-width: 1200px; /* Limita a largura máxima para telas grandes */
+    margin: auto; /* Centraliza o container */
+}
+
+.produto {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 16px;
+    text-align: center;
+    width: calc(33.333% - 20px); /* Calcula a largura para 3 colunas com gap */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Adiciona um estilo para as imagens dos produtos para manter a consistência */
+.produto img {
+    width: 100%;
+    max-width: 180px; /* Tamanho máximo da imagem */
+    height: auto;
+    aspect-ratio: 1 / 1; /* Garante que a imagem seja quadrada */
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 12px;
+}
+
+/* Ajuste para telas menores (responsividade) */
+@media (max-width: 992px) {
+    .produto {
+        width: calc(50% - 20px); /* 2 colunas em tablets */
+    }
+}
+
+@media (max-width: 768px) {
+    .produto {
+        width: 100%; /* 1 coluna em celulares */
+    }
+}
+
+/* Estilo do botão de comprar, caso não exista */
+.btn-comprar {
+    font-size: 0.9em;
+    padding: 8px 18px;
+    border-radius: 4px;
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    margin-top: auto; /* Empurra o botão para o final do card */
+    transition: background-color 0.2s;
+}
+
+.btn-comprar:hover {
+    background-color: #0056b3;
+}
+   
+/* --- NOVO CABEÇALHO --- */
+.main-header {
+    background: linear-gradient(to bottom, #2b709e, #5a6c7a);
+    color: white;
+    padding: 0 20px;
+    height: 80px; /* Altura reduzida para um visual mais moderno */
+    width: 100%;
+    display: flex;
+    justify-content: space-between; /* Distribui os itens principais */
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* --- Logo --- */
+.main-header .logo a {
+    display: flex;
+    align-items: center;
+}
+.main-header .logo img {
+    height: 60px; /* Tamanho ajustado do logo */
+    width: auto;
+}
+
+/* --- Navegação Principal --- */
+.main-header .main-nav ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+.main-header .main-nav li {
+    margin: 0 20px; /* Espaçamento entre os links */
+}
+.main-header .main-nav a {
+    color: #f0ebeb;
+    text-decoration: none;
+    font-size: 1.1rem;
+    padding: 5px 0;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.3s;
+}
+.main-header .main-nav a:hover {
+    border-bottom-color: #73c5eb;
+    color: #fff;
+}
+
+/* --- Barra de Busca --- */
+.search-bar {
+    display: flex;
+    align-items: center;
+}
+.search-bar input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px 0 0 5px;
+    width: 300px;
+    outline: none;
+}
+.search-bar button {
+    padding: 10px 15px;
+    background-color: #063866;
+    color: white;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+}
+
+/* --- Ícones do Usuário --- */
+.user-icons {
+    display: flex;
+    align-items: center;
+    gap: 25px; /* Espaço entre os ícones */
+}
+.user-icons .icon-link {
+    display: flex;
+    align-items: center;
+    flex-direction: column; /* Ícone em cima, texto embaixo */
+    text-decoration: none;
+    color: #f0ebeb;
+    font-size: 0.8rem;
+}
+.user-icons .icon-link img {
+    width: 28px;
+    height: 28px;
+    margin-bottom: 4px;
+}
+.user-icons .icon-link:hover {
+    color: #73c5eb;
+}
+
+/* --- Sobrescrevendo estilos antigos (se necessário) --- */
+/* Esta seção pode ser usada para garantir que as novas regras se apliquem */
+body {
+    padding-top: 80px; /* Adiciona espaço para o header fixo */
+}
+
+/* Removendo regras antigas e desnecessárias para o header */
+.top, #icone-login, .logo img {
+    all: unset; /* Reseta todas as propriedades dos seletores antigos */
+}
+/* FIM NOVO CABEÇALHO */
+
+/* Rodapé */
+footer {background: linear-gradient(to bottom,#5a6c7a, #2b709e); color: rgb(12, 11, 11); text-align: center; padding: 50px; position: relative; bottom: 0; width: 100%; max-width: 100%;}
    

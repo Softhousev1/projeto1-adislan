@@ -128,7 +128,7 @@
             // Se 'isAdmin' não for 'true', redireciona para a página de login
             if (isAdmin !== 'true') {
                 alert('Acesso negado. Por favor, faça login como administrador.');
-                window.location.href = 'admin.html';
+                window.location.href = 'login.html';
             }
         })();
     </script>
@@ -171,7 +171,7 @@
             // Remove a chave de admin do localStorage
             localStorage.removeItem('isAdmin');
             // Redireciona para a página de login
-            window.location.href = 'logindesexta.html';
+            window.location.href = 'login.html';
         });
     </script>
 </body>
