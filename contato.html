@@ -21,7 +21,7 @@
          
           <nav> 
             <ul>
-              <li><a href="#">Início</a></li>
+              <li><a href="./index.html">Início</a></li>
               <li><a href="#">Sobre</a></li>
           </nav>
          <input type="text" placeholder="Pesquisar...">
@@ -52,7 +52,7 @@
     <div class="card">
         <h1>Fale Conosco</h1>
         <main>
-            <form>
+            <form id="contato-form">
                 <label for="nome">Nome</label>
                 <input type="text" id="nome" name="nome" placeholder="digite seu nome" required><br>
 
@@ -65,9 +65,17 @@
                 <label for="mensagem">Mensagem</label>
                 <textarea id="mensagem" name="mensagem" placeholder="escreva sua mensagem" required rows="6"></textarea><br>
 
-                <button><a href="./index.html">Enviar</a></button>
+                <button type="submit">Enviar</button>
             </form>
         </main>
+    </div>
+
+    <!-- Modal de feedback -->
+    <div id="modal-feedback" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+      <div style="background:#fff; color:#111; padding:20px 24px; border-radius:8px; max-width:90%; width:360px; box-shadow:0 10px 30px rgba(0,0,0,0.2); text-align:center;">
+        <div style="margin-bottom:16px;">Mensagem enviada com sucesso! Obrigado pelo contato.</div>
+        <button id="modal-ok" style="background:#111; color:#fff; border:none; padding:8px 16px; border-radius:6px; cursor:pointer;">OK</button>
+      </div>
     </div>
 
     <footer>
@@ -86,5 +94,25 @@
       <p>Telefone: (11) 1234-5678</p>
       <p>Pagamento: Cartão de Crédito</p>
     </footer>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var form = document.getElementById('contato-form');
+        if (!form) return;
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            var modal = document.getElementById('modal-feedback');
+            if (modal) {
+                modal.style.display = 'flex';
+                var okBtn = document.getElementById('modal-ok');
+                if (okBtn) {
+                    okBtn.focus();
+                    okBtn.addEventListener('click', function () {
+                        location.reload();
+                    }, { once: true });
+                }
+            }
+        });
+    });
+    </script>
 </body>
 </html>
