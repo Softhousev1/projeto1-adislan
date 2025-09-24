@@ -8,13 +8,15 @@ let state = {
 function loadState() {
     const savedState = localStorage.getItem('adminState');
     if (savedState) {
-        state = JSON.parse(savedState);
+        // Apenas as finanças são carregadas do localStorage agora
+        state.finances = JSON.parse(savedState).finances || [];
     }
 }
 
 // Salva o estado no localStorage
 function saveState() {
-    localStorage.setItem('adminState', JSON.stringify(state));
+    // Apenas as finanças são salvas no localStorage agora
+    localStorage.setItem('adminState', JSON.stringify({ finances: state.finances }));
 }
 
 // Navegação
@@ -42,24 +44,50 @@ function showReport(){ alert('Funcionalidade de Relatórios em desenvolvimento.'
 function showSettings(){ alert('Funcionalidade de Configurações em desenvolvimento.'); }
 
 // Produtos
-function openAddProduct(){ document.getElementById('prodForm').style.display='block'; document.getElementById('pNome').focus(); }
-function closeAddProduct(){ document.getElementById('prodForm').style.display='none'; }
+function openAddProduct(){ 
+    document.getElementById('productModal').style.display='block'; 
+    document.getElementById('pNome').focus(); 
+}
+function closeAddProduct(){ 
+    document.getElementById('productModal').style.display='none'; 
+    document.getElementById('prodForm').reset(); // Limpa o formulário
+}
 
-function addProduct(e){
+async function addProduct(e){
     e.preventDefault();
     const nome = document.getElementById('pNome').value.trim();
-    const cat = document.getElementById('pCategoria').value.trim();
+    const cat_id = document.getElementById('pCategoria').value;
     const preco = parseFloat(document.getElementById('pPreco').value || 0);
     const estoque = parseInt(document.getElementById('pEstoque').value || 0, 10);
-    const id = Date.now();
-    state.products.push({id,nome,cat,preco,estoque});
-    saveState(); // Salva o estado
-    document.getElementById('pNome').value='';
-    document.getElementById('pCategoria').value='';
-    document.getElementById('pPreco').value='';
-    document.getElementById('pEstoque').value='0';
+    const desc = document.getElementById('pDescricao').value.trim();
+
+    // Validação simples
+    if (!nome || !preco || !cat_id) {
+        alert('Por favor, preencha nome, categoria e preço do produto.');
+        return;
+    }
+
+    const newProduct = {
+        name: nome,
+        category_id: cat_id,
+        price: preco,
+        stock: estoque,
+        description: desc
+    };
+
+    const { data, error } = await supabase
+        .from('products')
+        .insert([newProduct])
+        .select();
+
+    if (error) {
+        console.error('Erro ao adicionar produto:', error);
+        alert('Falha ao adicionar o produto. Verifique o console para mais detalhes.');
+        return false;
+    }
+    
     closeAddProduct();
-    refreshUI();
+    fetchAndRenderProducts(); // Atualiza a lista de produtos da UI
     showPage('produtos');
     return false;
 }
@@ -113,9 +141,12 @@ function refreshUI(){
     }
 
     state.products.forEach(prod=>{
-      const status = prod.estoque === 0 ? 'Sem estoque' : (prod.estoque <= 3 ? 'Estoque baixo' : 'Em estoque');
+      const status = prod.stock === 0 ? 'Sem estoque' : (prod.stock <= 3 ? 'Estoque baixo' : 'Em estoque');
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${escapeHtml(prod.nome)}</td><td>${escapeHtml(prod.cat)}</td><td>R$ ${prod.preco.toFixed(2)}</td><td>${prod.estoque}</td><td>${status}</td>`;
+      // Ajustado para usar os nomes de coluna do Supabase: name, category, price, stock
+      // A consulta agora traz o nome da categoria de 'categories.name'
+      const categoryName = prod.categories ? prod.categories.name : 'Sem Categoria';
+      tr.innerHTML = `<td>${escapeHtml(prod.name)}</td><td>${escapeHtml(categoryName)}</td><td>R$ ${Number(prod.price).toFixed(2)}</td><td>${prod.stock}</td><td>${status}</td>`;
       prodBody.appendChild(tr);
 
       const tr2 = tr.cloneNode(true);
@@ -137,30 +168,102 @@ function refreshUI(){
     });
 
     // Contagem de estoque
-    const em = state.products.filter(p=>p.estoque>3).length;
-    const baixo = state.products.filter(p=>p.estoque>0 && p.estoque<=3).length;
-    const zero = state.products.filter(p=>p.estoque===0).length;
+    const em = state.products.filter(p=>p.stock>3).length;
+    const baixo = state.products.filter(p=>p.stock>0 && p.stock<=3).length;
+    const zero = state.products.filter(p=>p.stock===0).length;
     document.getElementById('estoqueEm').innerText = em;
     document.getElementById('estoqueBaixo').innerText = baixo;
     document.getElementById('estoqueZero').innerText = zero;
     document.getElementById('itensFalta').innerText = baixo + zero;
 }
 
+async function fetchAndRenderProducts() {
+    const { data, error } = await supabase
+        .from('products')
+        .select(`
+            *,
+            categories ( name )
+        `)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Erro ao buscar produtos:', error);
+        alert('Não foi possível carregar os produtos. Verifique o console para mais detalhes.');
+        return;
+    }
+    
+    state.products = data;
+    refreshUI();
+}
+
+async function fetchAndPopulateCategories() {
+    const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name');
+
+    if (error) {
+        console.error('Erro ao buscar categorias:', error);
+        return;
+    }
+
+    const select = document.getElementById('pCategoria');
+    select.innerHTML = '<option value="">Selecione uma categoria</option>'; // Opção padrão
+    data.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat.id;
+        option.textContent = cat.name;
+        select.appendChild(option);
+    });
+}
+
+async function addNewCategory() {
+    const categoryName = prompt('Digite o nome da nova categoria:');
+    if (!categoryName || categoryName.trim() === '') {
+        return; // Usuário cancelou ou não digitou nada
+    }
+
+    const { data, error } = await supabase
+        .from('categories')
+        .insert([{ name: categoryName.trim() }])
+        .select();
+
+    if (error) {
+        console.error('Erro ao adicionar categoria:', error);
+        alert('Não foi possível adicionar a nova categoria. Verifique se ela já existe.');
+        return;
+    }
+
+    alert('Categoria adicionada com sucesso!');
+    fetchAndPopulateCategories(); // Atualiza o dropdown
+}
+
+
 function init(){
-    loadState(); // Carrega o estado salvo
+    loadState(); // Carrega o estado salvo (apenas finanças)
     refreshUI();
     showPage('panel');
+    fetchAndRenderProducts(); // Busca e renderiza os produtos do Supabase
+    fetchAndPopulateCategories(); // Busca e preenche as categorias no modal
+    document.getElementById('btnNovaCategoria').addEventListener('click', addNewCategory);
 }
 
 // Helpers
-function formatMoney(v){ return 'R$' + v.toFixed(2); }
+function formatMoney(v){ return 'R$' + Number(v).toFixed(2); }
 function escapeHtml(s){ return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 // Inicializa a aplicação
 init();
 
 // Função de logout
-document.getElementById('btnLogout').onclick = function() {
-    localStorage.removeItem('isAdmin'); // Remove a chave de admin
+document.getElementById('btnLogout').onclick = async function() {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+        console.error('Erro ao fazer logout:', error);
+        return;
+    }
+    // Limpa qualquer estado antigo, se necessário
+    localStorage.removeItem('isAdmin'); 
+    localStorage.removeItem('adminState'); 
     window.location.href = 'login.html';
 };

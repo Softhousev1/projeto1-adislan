@@ -5,13 +5,27 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Painel Administrativo - Moda Online</title>
 <link rel="stylesheet" href="admin.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <script>
-    // Verifica se está autenticado (usando a mesma chave 'isAdmin' do projeto)
-    if (localStorage.getItem("isAdmin") !== "true") {
-      window.location.href = "login.html";
-    }
+    const supabaseUrl = 'https://hylttfhaedvytykjpeze.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5bHR0ZmhhZWR2eXR5a2pwZXplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTE1MDgsImV4cCI6MjA3NDI4NzUwOH0.e0BmMYbBC9QBI6TNsKgWUckFqCPnjPGEAq6-7h1W18A'; 
+    
+    // O 'supabase' aqui é o objeto global da biblioteca. Criamos o cliente
+    // e o atribuímos a window.supabase para torná-lo global para outros scripts.
+    const supaClient = supabase.createClient(supabaseUrl, supabaseKey);
+    window.supabase = supaClient;
+
+    // Verifica a sessão do usuário
+    const checkSession = async () => {
+      const { data: { session } } = await supaClient.auth.getSession();
+      if (!session) {
+        window.location.href = "login.html";
+      }
+    };
+    
+    checkSession();
   </script>
 
 <!-- APP -->
@@ -121,32 +135,7 @@
           <button class="btn green" onclick="openAddProduct()">Adicionar Produto</button>
         </div>
 
-        <div id="prodForm" style="margin-top:14px;display:none">
-          <form onsubmit="return addProduct(event)">
-            <div class="form-row">
-              <div style="flex:2">
-                <label>Produto</label>
-                <input id="pNome" type="text" required placeholder="Nome do produto" />
-              </div>
-              <div style="flex:1">
-                <label>Categoria</label>
-                <input id="pCategoria" type="text" placeholder="Categoria" />
-              </div>
-              <div style="flex:1">
-                <label>Preço (R$)</label>
-                <input id="pPreco" type="number" step="0.01" min="0" placeholder="0.00" />
-              </div>
-              <div style="flex:1">
-                <label>Estoque</label>
-                <input id="pEstoque" type="number" min="0" value="0" />
-              </div>
-            </div>
-            <div style="margin-top:12px">
-              <button class="btn green">Adicionar Produto</button>
-              <button type="button" class="btn grey" onclick="closeAddProduct()">Cancelar</button>
-            </div>
-          </form>
-        </div>
+        <!-- O formulário foi removido daqui e será movido para o modal no final do arquivo -->
 
         <table class="table" id="prodTable" style="margin-top:16px">
           <thead><tr><th>PRODUTO</th><th>CATEGORIA</th><th>PREÇO</th><th>ESTOQUE</th><th>STATUS</th></tr></thead>
@@ -258,6 +247,56 @@
     </section>
   </main>
 </div>
+
+<!-- Modal de Adicionar Produto -->
+<div id="productModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Adicionar Novo Produto</h2>
+      <span class="close-button" onclick="closeAddProduct()">&times;</span>
+    </div>
+    <div class="modal-body">
+      <form id="prodForm" onsubmit="return addProduct(event)">
+        <div class="form-row">
+          <div style="flex:2">
+            <label>Produto</label>
+            <input id="pNome" type="text" required placeholder="Nome do produto" />
+          </div>
+          <div style="flex:1">
+              <label>Categoria</label>
+              <div style="display: flex; gap: 8px;">
+                <select id="pCategoria" style="flex:1;" required>
+                  <option value="">Carregando...</option>
+                </select>
+                <button type="button" id="btnNovaCategoria" class="btn green" style="padding: 8px 10px;">+</button>
+              </div>
+            </div>
+        </div>
+        <div class="form-row" style="margin-top: 12px;">
+          <div style="flex:1">
+            <label>Preço (R$)</label>
+            <input id="pPreco" type="number" step="0.01" min="0" placeholder="0.00" />
+          </div>
+          <div style="flex:1">
+            <label>Estoque</label>
+            <input id="pEstoque" type="number" min="0" value="0" />
+          </div>
+        </div>
+        <div class="form-row" style="margin-top: 12px;">
+            <div style="flex:1">
+                <label>Descrição</label>
+                <textarea id="pDescricao" placeholder="Descrição detalhada do produto..."></textarea>
+            </div>
+        </div>
+        <div style="margin-top:18px; text-align: right;">
+          <button type="button" class="btn grey" onclick="closeAddProduct()">Cancelar</button>
+          <button class="btn green">Adicionar Produto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script src="admin.js"></script>
 </body>
 </html>
