@@ -3,179 +3,133 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel Administrativo - Login</title>
-  <style>
-    /* Fundo com gradiente */
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #0a2342 0%, #173a5e 60%, #2c3e50 100%);
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    /* Card de login */
-    .login-container {
-      background: linear-gradient(120deg, #0a2342 0%, #173a5e 80%, #2c3e50 100%);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-radius: 12px;
-      padding: 40px;
-      width: 350px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-      color: #fff;
-      text-align: center;
-      border: 1.5px solid #173a5e;
-    }
-
-    .login-container h2 {
-      margin: 0 0 10px;
-      font-size: 1.5rem;
-    }
-
-    .login-container p {
-      margin-bottom: 20px;
-      font-size: 0.9rem;
-      color: #ddd;
-    }
-
-    .login-container .icon {
-      font-size: 40px;
-      margin-bottom: 15px;
-    }
-
-    /* Inputs */
-    .login-container input {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 6px;
-      font-size: 1rem;
-      outline: none;
-    }
-
-    /* Botão */
-    .login-container button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 15px;
-      border: none;
-      border-radius: 6px;
-      background: linear-gradient(90deg, #173a5e 0%, #0a2342 80%, #2c3e50 100%);
-      color: #fff;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: 0.3s;
-      box-shadow: 0 2px 8px rgba(10,35,66,0.18);
-    }
-
-    .login-container button:hover {
-      opacity: 0.9;
-    }
-
-    /* Texto pequeno */
-    .login-container small {
-      display: block;
-      margin-top: 15px;
-      color: #ffffff;
-      font-size: 0.8rem;
-    }
-
-    .login-container small a {
-      color: #00ccff;
-      text-decoration: none;
-    }
-  </style>
-  <style>
-    .alert {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      position: fixed;
-      top: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: linear-gradient(90deg, #ff0004, #ff0000);
-      color: #fff;
-      padding: 16px 32px;
-      border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-      font-size: 1.05rem;
-      z-index: 9999;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.4s, top 0.4s;
-      animation: none;
-    }
-    .alert.show {
-      opacity: 1;
-      pointer-events: auto;
-      top: 50px;
-    }
-    .alert .close-btn {
-      background: none;
-      border: none;
-      color: #fff;
-      font-size: 1.3rem;
-      cursor: pointer;
-      margin-left: 8px;
-      transition: color 0.2s;
-    }
-    .alert .close-btn:hover {
-      color: #222;
-    }
-  </style>
+  <title>Login - Sistema CRUD</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <div class="alert" id="alertBox">
-    <span style="font-size:1.3em;">⚠️</span>
-    <span id="alertMsg">Usuário ou senha incorretos!</span>
-    <button class="close-btn" id="closeAlert" title="Fechar">&times;</button>
-  </div>
+
   <div class="login-container">
-    <div class="icon">🔒</div>
-    <h2>Painel Administrativo</h2>
-    <p>Faça login para gerenciar seu sistema</p>
-    
-    <form id="loginForm">
-      <input type="text" id="usuario" placeholder="Usuário" required>
-      <input type="password" id="senha" placeholder="Senha" required>
-      <button type="submit">Entrar</button>
-    </form>
-    
-    <small>Credenciais padrão: <b>admin / admin123</b></small>
+    <div class="card">
+      <div class="card-header">
+        <h3 class="mb-0">Login</h3>
+        <p class="mb-0">Faça login para continuar</p>
+      </div>
+      <div class="card-body p-4">
+        <div id="login-form">
+          <div class="form-floating mb-3">
+            <input type="email" class="form-control" id="email" placeholder="nome@exemplo.com" required>
+            <label for="email">Email</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="password" placeholder="Senha" required>
+            <label for="password">Senha</label>
+          </div>
+          <div class="d-grid gap-2">
+            <button id="login-button" class="btn btn-primary">Entrar</button>
+            <button id="signup-button" class="btn btn-outline-secondary">Criar Conta</button>
+          </div>
+          <div id="login-message" class="mt-3 text-center"></div>
+        </div>
+      </div>
+    </div>
   </div>
+  
 
-  <script>
-    document.getElementById("loginForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const user = document.getElementById("usuario").value;
-      const pass = document.getElementById("senha").value;
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+   
+   <!-- Supabase -->
+   <script type="module">
+     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+ 
+     const supabaseUrl = 'https://hylttfhaedvytykjpeze.supabase.co';
+     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5bHR0ZmhhZWR2eXR5a2pwZXplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTE1MDgsImV4cCI6MjA3NDI4NzUwOH0.e0BmMYbBC9QBI6TNsKgWUckFqCPnjPGEAq6-7h1W18A';
+     const supabase = createClient(supabaseUrl, supabaseKey);
 
-      if (user === "admin" && pass === "admin123") {
-        alert("Login realizado com sucesso!");
-        // Salva autenticação
-        localStorage.setItem("autenticado", "true");
-        window.location.href = "dashboard.html";
-      } else {
-        // Alerta visual moderno e dinâmico
-        const alertBox = document.getElementById("alertBox");
-        alertBox.classList.add("show");
-        alertBox.style.top = "50px";
-        // Fecha automaticamente após 3s
-        const timeout = setTimeout(() => {
-          alertBox.classList.remove("show");
-        }, 3000);
-        // Permite fechar manualmente
-        document.getElementById("closeAlert").onclick = function() {
-          alertBox.classList.remove("show");
-          clearTimeout(timeout);
-        };
-      }
-    });
-  </script>
-</body>
-</html>
+     // Função para exibir mensagens
+     function showMessage(message, isError = false) {
+       const messageElement = document.getElementById('login-message');
+       messageElement.textContent = message;
+       messageElement.style.color = isError ? 'red' : 'green';
+     }
+
+     // Adiciona evento ao botão de login
+     document.getElementById('login-button').addEventListener('click', async () => {
+       const email = document.getElementById('email').value;
+       const password = document.getElementById('password').value;
+
+       if (!email || !password) {
+         showMessage('Por favor, preencha todos os campos.', true);
+         return;
+       }
+
+       const { data, error } = await supabase.auth.signInWithPassword({
+         email: email,
+         password: password,
+       });
+
+       if (error) {
+         showMessage('Credenciais inválidas. Tente novamente.', true);
+         console.error('Erro no login:', error.message);
+       } else {
+         showMessage('Login realizado com sucesso! Redirecionando...');
+         setTimeout(() => {
+           window.location.href = 'admin.html';
+         }, 1000);
+       }
+     });
+
+     // Redireciona para a página de cadastro
+     document.getElementById('signup-button').addEventListener('click', () => {
+         window.location.href = 'cadastro.html';
+     });
+   </script>
+ 
+   <!-- Script de Login com LocalStorage (Temporário) -->
+   <!-- 
+   <script>
+     // Função para exibir mensagens
+     function showMessage(message, isError = false) {
+       const messageElement = document.getElementById('login-message');
+       messageElement.textContent = message;
+       messageElement.style.color = isError ? 'red' : 'green';
+     }
+ 
+     // Adiciona evento ao botão de login
+     document.getElementById('login-button').addEventListener('click', () => {
+       const email = document.getElementById('email').value;
+       const password = document.getElementById('password').value;
+ 
+       // Credenciais do administrador (exemplo)
+       const adminEmail = 'admin@modaatual.com';
+       const adminPassword = 'admin123';
+ 
+       if (!email || !password) {
+         showMessage('Por favor, preencha todos os campos.', true);
+         return;
+       }
+ 
+       // Verifica se as credenciais são de administrador
+       if (email === adminEmail && password === adminPassword) {
+         showMessage('Login de administrador realizado com sucesso! Redirecionando...');
+         // Armazena o estado de admin no localStorage
+         localStorage.setItem('isAdmin', 'true');
+         // Redireciona para o painel administrativo após 1 segundo
+         setTimeout(() => {
+           window.location.href = 'admin.html';
+         }, 1000);
+       } else {
+         // Aqui você poderia adicionar a lógica para usuários normais se quisesse
+         showMessage('Credenciais inválidas.', true);
+       }
+     });
+ 
+     // Redireciona para a página de cadastro
+     document.getElementById('signup-button').addEventListener('click', () => {
+         window.location.href = 'cadastro.html';
+     });
+   </script>
+   -->
+ </body>
+ </html>

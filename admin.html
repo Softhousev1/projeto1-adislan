@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Painel Administrativo - Moda Online</title>
+<link rel="stylesheet" href="admin.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <script>
+    const supabaseUrl = 'https://hylttfhaedvytykjpeze.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5bHR0ZmhhZWR2eXR5a2pwZXplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTE1MDgsImV4cCI6MjA3NDI4NzUwOH0.e0BmMYbBC9QBI6TNsKgWUckFqCPnjPGEAq6-7h1W18A'; 
+    
+    // O 'supabase' aqui é o objeto global da biblioteca. Criamos o cliente
+    // e o atribuímos a window.supabase para torná-lo global para outros scripts.
+    const supaClient = supabase.createClient(supabaseUrl, supabaseKey);
+    window.supabase = supaClient;
+
+    // Verifica a sessão do usuário
+    const checkSession = async () => {
+      const { data: { session } } = await supaClient.auth.getSession();
+      if (!session) {
+        window.location.href = "login.html";
+      }
+    };
+    
+    checkSession();
+  </script>
+
+<!-- APP -->
+<div id="app" class="app">
+  <aside>
+    <div class="brand">
+      <div class="avatar">MA</div>
+      <div>
+        <div class="username">Moda Online</div>
+        <div style="font-size:12px;color:var(--muted)">admin</div>
+      </div>
+    </div>
+
+    <nav>
+      <div class="nav-item active" data-page="panel" onclick="navigate(event)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1f3b73"><rect x="3" y="3" width="18" height="18" rx="3" stroke-width="1.6"/></svg>
+        Painel
+      </div>
+      <div class="nav-item" data-page="produtos" onclick="navigate(event)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1f3b73"><path d="M3 7l9-4 9 4v10l-9 4-9-4z" stroke-width="1.6"/></svg>
+        Produtos
+      </div>
+      <div class="nav-item" data-page="financeiro" onclick="navigate(event)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1f3b73"><path d="M12 1v22" stroke-width="1.6"/><path d="M5 7h14" stroke-width="1.6"/></svg>
+        Financeiro
+      </div>
+      <div class="nav-item" data-page="estoque" onclick="navigate(event)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1f3b73"><path d="M3 3h18v6H3z" stroke-width="1.6"/><path d="M3 13h18v8H3z" stroke-width="1.6"/></svg>
+        Estoque
+      </div>
+      <div class="nav-item" data-page="categorias" onclick="navigate(event)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1f3b73"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke-width="1.6"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96" stroke-width="1.6"></polyline><line x1="12" y1="22.08" x2="12" y2="12" stroke-width="1.6"></line></svg>
+        Categorias
+      </div>
+    </nav>
+
+  <button class="logout" id="btnLogout">🚪 Sair</button>
+  </aside>
+
+  <main>
+    <header>
+      <h1 id="pageTitle">Painel</h1>
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="online">Online</div>
+        <div style="width:34px;height:34px;border-radius:50%;background:#dbeafe"></div>
+      </div>
+    </header>
+
+    <!-- CARDS -->
+    <div class="grid-cards" id="summaryCards">
+      <div class="card small">
+        <div>
+          <h3>Total de Produtos</h3>
+          <div class="value" id="totalProdutos">0</div>
+        </div>
+        <div style="background:#eef2ff;padding:8px;border-radius:8px">📦</div>
+      </div>
+      <div class="card small">
+        <div>
+          <h3>Receita Total</h3>
+          <div class="value" id="totalReceita">R$0.00</div>
+        </div>
+        <div style="background:#eeffef;padding:8px;border-radius:8px">💰</div>
+      </div>
+      <div class="card small">
+        <div>
+          <h3>Despesas Totais</h3>
+          <div class="value" id="totalDespesas">R$0.00</div>
+        </div>
+        <div style="background:#fff0f0;padding:8px;border-radius:8px">📉</div>
+      </div>
+      <div class="card small">
+        <div>
+          <h3>Itens em Falta</h3>
+          <div class="value" id="itensFalta">0</div>
+        </div>
+        <div style="background:#fff7ed;padding:8px;border-radius:8px">⚠️</div>
+      </div>
+    </div>
+
+    <!-- PANEL AREA -->
+    <section id="panel" class="page active">
+      <div class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:18px">
+          <div style="flex:1">
+            <h2>Atividades Recentes</h2>
+            <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
+              <div style="background:#fbfdff;padding:12px;border-radius:10px">✅ Sistema de gestão de produtos ativo</div>
+              <div style="background:#fbfdff;padding:12px;border-radius:10px">💰 Controle financeiro habilitado</div>
+            </div>
+          </div>
+          <div style="width:380px">
+            <h2>Ações Rápidas</h2>
+            <div class="quick">
+              <div class="tile" onclick="showPage('produtos')">➕ Adicionar Produto</div>
+              <div class="tile" onclick="showPage('financeiro')">➕ Adicionar Receita</div>
+              <div class="tile" onclick="showReport()">📊 Ver Relatórios</div>
+              <div class="tile" onclick="showSettings()">⚙️ Configurações</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUTOS -->
+    <section id="produtos" class="page" style="display:none">
+      <div class="panel">
+        <h2>Produtos</h2>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="width:60%"><p style="margin:0;color:var(--muted)">Gerencie seus produtos: adicione nome, categoria, preço e estoque.</p></div>
+          <button class="btn green" onclick="openAddProduct()">Adicionar Produto</button>
+        </div>
+
+        <!-- O formulário foi removido daqui e será movido para o modal no final do arquivo -->
+
+        <table class="table" id="prodTable" style="margin-top:16px">
+          <thead><tr><th>IMAGEM</th><th>PRODUTO</th><th>CATEGORIA</th><th>PREÇO</th><th>ESTOQUE</th><th>STATUS</th><th style="width: 150px;">AÇÕES</th></tr></thead>
+          <tbody id="prodBody">
+          </tbody>
+        </table>
+
+        <div id="prodEmpty" class="empty">
+          <div style="font-size:34px">📋</div>
+          <div style="margin-top:8px;font-weight:700">Nenhum produto cadastrado</div>
+          <div style="margin-top:6px;color:var(--muted)">Adicione produtos para começar a controlar seu estoque</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINANCEIRO -->
+    <section id="financeiro" class="page" style="display:none">
+      <div class="panel">
+        <h2>Controle Financeiro</h2>
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+          <div class="card small" style="flex:1">
+            <h3>Receita Total</h3><div class="value" id="rReceita">R$0.00</div>
+          </div>
+          <div class="card small" style="flex:1">
+            <h3>Despesas Totais</h3><div class="value" id="rDespesas">R$0.00</div>
+          </div>
+          <div class="card small" style="flex:1">
+            <h3>Lucro Líquido</h3><div class="value" id="rLucro">R$0.00</div>
+          </div>
+          <div style="flex:0">
+            <button class="btn green" onclick="toggleFinForm()">Adicionar Registro</button>
+          </div>
+        </div>
+
+        <div id="finForm" style="display:none">
+          <form onsubmit="return addFinance(event)">
+            <div class="form-row">
+              <div style="flex:1">
+                <label>Tipo</label>
+                <select id="fTipo">
+                  <option value="receita">Receita</option>
+                  <option value="despesa">Despesa</option>
+                </select>
+              </div>
+              <div style="flex:1">
+                <label>Valor (R$)</label>
+                <input id="fValor" type="number" step="0.01" min="0" required />
+              </div>
+              <div style="flex:2">
+                <label>Categoria</label>
+                <input id="fCategoria" type="text" />
+              </div>
+              <div style="flex:2">
+                <label>Descrição</label>
+                <input id="fDescricao" type="text" />
+              </div>
+            </div>
+            <div style="margin-top:12px">
+              <button class="btn green">Adicionar Registro</button>
+              <button type="button" class="btn grey" onclick="toggleFinForm()">Cancelar</button>
+            </div>
+          </form>
+        </div>
+
+        <div style="margin-top:14px">
+          <h3>Transações Recentes</h3>
+          <table class="table">
+            <thead><tr><th>TIPO</th><th>VALOR</th><th>CATEGORIA</th><th>DESCRIÇÃO</th></tr></thead>
+            <tbody id="finBody"></tbody>
+          </table>
+          <div id="finEmpty" class="empty">
+            <div style="font-size:34px">💵</div>
+            <div style="margin-top:8px;font-weight:700">Nenhum registro financeiro ainda</div>
+            <div style="margin-top:6px;color:var(--muted)">Adicione sua primeira transação para começar</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ESTOQUE -->
+    <section id="estoque" class="page" style="display:none">
+      <div class="panel">
+        <h2>Controle de Estoque</h2>
+        <div style="display:flex;gap:12px;margin-bottom:12px">
+          <div class="card small" style="flex:1;background:#ecfff1">
+            <h3>Em Estoque</h3><div class="value" id="estoqueEm">0</div>
+          </div>
+          <div class="card small" style="flex:1;background:#fff7ef">
+            <h3>Estoque Baixo</h3><div class="value" id="estoqueBaixo">0</div>
+          </div>
+          <div class="card small" style="flex:1;background:#fff0f0">
+            <h3>Sem Estoque</h3><div class="value" id="estoqueZero">0</div>
+          </div>
+        </div>
+
+        <h3>Todos os Produtos</h3>
+        <div style="margin-top:12px">
+          <table class="table">
+            <thead><tr><th>PRODUTO</th><th>CATEGORIA</th><th>PREÇO</th><th>ESTOQUE</th><th>STATUS</th></tr></thead>
+            <tbody id="stockBody"></tbody>
+          </table>
+          <div id="stockEmpty" class="empty">
+            <div style="font-size:34px">📦</div>
+            <div style="margin-top:8px;font-weight:700">Nenhum dado de estoque</div>
+            <div style="margin-top:6px;color:var(--muted)">Adicione produtos para rastrear o estoque</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CATEGORIAS -->
+    <section id="categorias" class="page" style="display:none">
+      <div class="panel">
+        <h2>Gerenciar Categorias</h2>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="width:60%"><p style="margin:0;color:var(--muted)">Adicione, edite ou remova categorias de produtos.</p></div>
+          <button class="btn green" onclick="addNewCategory()">Adicionar Categoria</button>
+        </div>
+
+        <table class="table" id="catTable" style="margin-top:16px">
+          <thead><tr><th>NOME DA CATEGORIA</th><th style="width: 150px;">AÇÕES</th></tr></thead>
+          <tbody id="catBody">
+          </tbody>
+        </table>
+
+        <div id="catEmpty" class="empty" style="display:none;">
+          <div style="font-size:34px">🏷️</div>
+          <div style="margin-top:8px;font-weight:700">Nenhuma categoria cadastrada</div>
+          <div style="margin-top:6px;color:var(--muted)">Adicione categorias para organizar seus produtos</div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Modal de Adicionar Produto -->
+<div id="productModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Adicionar Novo Produto</h2>
+      <span class="close-button" onclick="closeAddProduct()">&times;</span>
+    </div>
+    <div class="modal-body">
+      <form id="prodForm" onsubmit="return saveProduct(event)">
+        <div class="form-row">
+          <div style="flex:2">
+            <label>Produto</label>
+            <input id="pNome" type="text" required placeholder="Nome do produto" />
+          </div>
+          <div style="flex:1">
+              <label>Categoria</label>
+              <div style="display: flex; gap: 8px;">
+                <select id="pCategoria" style="flex:1;" required>
+                  <option value="">Carregando...</option>
+                </select>
+                <button type="button" id="btnNovaCategoria" class="btn green" style="padding: 8px 10px;">+</button>
+              </div>
+            </div>
+        </div>
+        <div class="form-row" style="margin-top: 12px;">
+          <div style="flex:1">
+            <label>Preço (R$)</label>
+            <input id="pPreco" type="number" step="0.01" min="0" placeholder="0.00" />
+          </div>
+          <div style="flex:1">
+            <label>Estoque</label>
+            <input id="pEstoque" type="number" min="0" value="0" />
+          </div>
+        </div>
+        <div class="form-row" style="margin-top: 12px;">
+            <div style="flex:1">
+                <label>Descrição</label>
+                <textarea id="pDescricao" placeholder="Descrição detalhada do produto..."></textarea>
+            </div>
+        </div>
+        <div class="form-row" style="margin-top: 12px;">
+            <div style="flex:1">
+                <label>Imagem do Produto</label>
+                <input type="file" id="pImagem" accept="image/png, image/jpeg, image/webp">
+            </div>
+        </div>
+        <div style="margin-top:18px; text-align: right;">
+          <button type="button" class="btn grey" onclick="closeAddProduct()">Cancelar</button>
+          <button class="btn green">Adicionar Produto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>
