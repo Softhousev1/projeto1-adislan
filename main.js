@@ -1,7 +1,8 @@
 // Configuração do Supabase
 const supabaseUrl = 'https://hylttfhaedvytykjpeze.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5bHR0ZmhhZWR2eXR5a2pwZXplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTE1MDgsImV4cCI6MjA3NDI4NzUwOH0.e0BmMYbBC9QBI6TNsKgWUckFqCPnjPGEAq6-7h1W18A';
-const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+// O global da CDN é 'supabase' (minúsculo). Criamos nosso cliente a partir dele.
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
 // Função para buscar e renderizar os produtos na página inicial
 async function loadHomePageProducts() {
@@ -11,7 +12,7 @@ async function loadHomePageProducts() {
   // Adiciona uma mensagem de carregamento
   productListContainer.innerHTML = '<p>Carregando produtos...</p>';
 
-  const { data: products, error } = await supabase
+  const { data: products, error } = await supabaseClient
     .from('products')
     .select('*')
     .order('created_at', { ascending: false }) // Pega os mais recentes

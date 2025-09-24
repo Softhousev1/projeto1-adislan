@@ -1,7 +1,7 @@
 // Configuração do Supabase (substitua com suas chaves se necessário, mas idealmente use variáveis de ambiente)
 const supabaseUrl = 'https://hylttfhaedvytykjpeze.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5bHR0ZmhhZWR2eXR5a2pwZXplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTE1MDgsImV4cCI6MjA3NDI4NzUwOH0.e0BmMYbBC9QBI6TNsKgWUckFqCPnjPGEAq6-7h1W18A';
-const supabase = window.supabase ? window.supabase : Supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
 // Função para buscar e renderizar os detalhes do produto
 async function loadProductDetails() {
@@ -18,7 +18,7 @@ async function loadProductDetails() {
   }
 
   // 2. Buscar os dados do produto no Supabase
-  const { data: product, error } = await supabase
+  const { data: product, error } = await supabaseClient
     .from('products')
     .select(`
       *,
@@ -45,7 +45,7 @@ async function loadProductDetails() {
       <img src="${product.image_url || 'img/placeholder.png'}" alt="${escapeHtml(product.name)}">
     </div>
     <div class="product-details">
-      <span class="category">${escapeHtml(product.categories.name)}</span>
+      <span class="category">${product.categories ? escapeHtml(product.categories.name) : 'Sem Categoria'}</span>
       <h1>${escapeHtml(product.name)}</h1>
       <p class="price">R$ ${Number(product.price).toFixed(2)}</p>
       <p class="description">${escapeHtml(product.description || 'Nenhuma descrição disponível.')}</p>
