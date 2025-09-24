@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carregando Produto...</title>
+  <link rel="stylesheet" href="style.css"> <!-- Reutilizando o estilo principal -->
+  <link rel="stylesheet" href="produto.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <header class="main-header">
+    <a href="index.html" class="logo">Moda Atual</a>
+    <nav class="main-nav">
+      <a href="index.html#feminino">Feminino</a>
+      <a href="index.html#masculino">Masculino</a>
+      <a href="index.html#calcados">Calçados</a>
+      <a href="sobreosite.html">Sobre</a>
+      <a href="contato.html">Contato</a>
+    </nav>
+    <div class="header-icons">
+      <a href="login.html"><img src="img/icons/login.png" alt="Login"></a>
+      <a href="#"><img src="img/icons/carrinho-icone.png" alt="Carrinho"></a>
+    </div>
+  </header>
+
+  <main id="product-container" class="product-container">
+    <!-- O conteúdo do produto será inserido aqui pelo JavaScript -->
+    <div id="loader" class="loader"></div>
+  </main>
+
+  <footer class="main-footer">
+    <p>&copy; 2024 Moda Atual. Todos os direitos reservados.</p>
+  </footer>
+
+  <script src="produto.js"></script>
+</body>
+</html>
