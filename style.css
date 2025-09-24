@@ -362,11 +362,13 @@ text-align :left;
     font-size: 0.8rem;
 }
 .user-icons .icon-link img {
-    width: 24px; /* Ajuste o tamanho do ícone aqui */
-    height: 24px;
+    width: 28px; /* Tamanho ajustado para ícones */
+    height: 28px;
+    margin-bottom: 4px; /* Espaço entre o ícone e o texto */
 }
 .user-icons .icon-link span {
-  margin-left: 8px;
+  /* A margem à esquerda é removida pois a direção agora é coluna */
+  margin-left: 0;
 }
 .user-icons .icon-link:hover {
     color: #73c5eb;
