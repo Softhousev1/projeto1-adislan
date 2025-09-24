@@ -22,9 +22,10 @@
       .logo img {
 
       position: fixed;
-  top: 0px;
-  left: 0px; /* Em vez de right */
-  z-index: 100;
+  top: 10px;
+  left: 10px; /* Em vez de right */
+  z-index: 1001; /* Certifique-se de que o z-index seja maior que o do menu */
+  height: 100px; /* Ajuste a altura conforme necessário */
   max-width: 100%;
 
 text-align :left;
@@ -296,10 +297,13 @@ text-align :left;
 .main-header .logo a {
     display: flex;
     align-items: center;
+    height: 100%;
 }
 .main-header .logo img {
-    height: 60px; /* Tamanho ajustado do logo */
+    height: 70px; /* Ajuste para alinhar com o header */
     width: auto;
+    display: block;
+    margin: 0 0 0 8px; /* Pequeno espaçamento à esquerda se necessário */
 }
 
 /* --- Navegação Principal --- */
