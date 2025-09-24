@@ -73,8 +73,8 @@
         <h2 class="checkout-section-title">Produtos Selecionados</h2>
         <ul id="lista-carrinho" style="list-style:none;padding:0;"></ul>
         <div id="acoes-carrinho" style="margin-top:16px;">
-          <button id="btn-prosseguir" style="background:#27ae60;color:#fff;padding:8px 16px;border:none;border-radius:4px;">Prosseguir com a compra</button>
-          <button id="btn-desistir" style="background:#e74c3c;color:#fff;padding:8px 16px;border:none;border-radius:4px;margin-left:8px;">Desistir</button>
+          <button id="btn-prosseguir" class="btn-carrinho" style="background:#73c5eb;color:#fff;">Prosseguir com a compra</button>
+          <button id="btn-desistir" class="btn-carrinho" style="background:#e74c3c;color:#fff;">Desistir</button>
         </div>
       </section>
    
@@ -120,7 +120,7 @@
         }
       };
       document.getElementById('btn-prosseguir').onclick = function() {
-        window.location.href = 'cadastro.html';
+  window.location.href = 'checkout.html';
       };
       renderCarrinho();
 
