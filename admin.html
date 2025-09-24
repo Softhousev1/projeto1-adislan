@@ -56,6 +56,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="#1f3b73"><path d="M3 3h18v6H3z" stroke-width="1.6"/><path d="M3 13h18v8H3z" stroke-width="1.6"/></svg>
         Estoque
       </div>
+      <div class="nav-item" data-page="categorias" onclick="navigate(event)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1f3b73"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke-width="1.6"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96" stroke-width="1.6"></polyline><line x1="12" y1="22.08" x2="12" y2="12" stroke-width="1.6"></line></svg>
+        Categorias
+      </div>
     </nav>
 
   <button class="logout" id="btnLogout">🚪 Sair</button>
@@ -138,7 +142,7 @@
         <!-- O formulário foi removido daqui e será movido para o modal no final do arquivo -->
 
         <table class="table" id="prodTable" style="margin-top:16px">
-          <thead><tr><th>PRODUTO</th><th>CATEGORIA</th><th>PREÇO</th><th>ESTOQUE</th><th>STATUS</th></tr></thead>
+          <thead><tr><th>IMAGEM</th><th>PRODUTO</th><th>CATEGORIA</th><th>PREÇO</th><th>ESTOQUE</th><th>STATUS</th><th style="width: 150px;">AÇÕES</th></tr></thead>
           <tbody id="prodBody">
           </tbody>
         </table>
@@ -245,6 +249,29 @@
         </div>
       </div>
     </section>
+
+    <!-- CATEGORIAS -->
+    <section id="categorias" class="page" style="display:none">
+      <div class="panel">
+        <h2>Gerenciar Categorias</h2>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="width:60%"><p style="margin:0;color:var(--muted)">Adicione, edite ou remova categorias de produtos.</p></div>
+          <button class="btn green" onclick="addNewCategory()">Adicionar Categoria</button>
+        </div>
+
+        <table class="table" id="catTable" style="margin-top:16px">
+          <thead><tr><th>NOME DA CATEGORIA</th><th style="width: 150px;">AÇÕES</th></tr></thead>
+          <tbody id="catBody">
+          </tbody>
+        </table>
+
+        <div id="catEmpty" class="empty" style="display:none;">
+          <div style="font-size:34px">🏷️</div>
+          <div style="margin-top:8px;font-weight:700">Nenhuma categoria cadastrada</div>
+          <div style="margin-top:6px;color:var(--muted)">Adicione categorias para organizar seus produtos</div>
+        </div>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -256,7 +283,7 @@
       <span class="close-button" onclick="closeAddProduct()">&times;</span>
     </div>
     <div class="modal-body">
-      <form id="prodForm" onsubmit="return addProduct(event)">
+      <form id="prodForm" onsubmit="return saveProduct(event)">
         <div class="form-row">
           <div style="flex:2">
             <label>Produto</label>
@@ -286,6 +313,12 @@
             <div style="flex:1">
                 <label>Descrição</label>
                 <textarea id="pDescricao" placeholder="Descrição detalhada do produto..."></textarea>
+            </div>
+        </div>
+        <div class="form-row" style="margin-top: 12px;">
+            <div style="flex:1">
+                <label>Imagem do Produto</label>
+                <input type="file" id="pImagem" accept="image/png, image/jpeg, image/webp">
             </div>
         </div>
         <div style="margin-top:18px; text-align: right;">

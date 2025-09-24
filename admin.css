@@ -39,6 +39,7 @@ header h1{margin:0;font-size:20px}
 .btn{padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
 .btn.green{background:#12b76a;color:#fff}
 .btn.grey{background:#4b5563;color:#fff}
+.btn.red{background:#ef4444;color:#fff}
 .quick{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .quick .tile{padding:18px;border-radius:10px;background:#fbfdff;border:1px solid #f1f5f9;text-align:center}
 /* forms */
