@@ -245,32 +245,6 @@ function validateForm() {
         isValid = false;
     }
     
-    // Verificar método de pagamento selecionado
-    const selectedMethod = document.querySelector('.payment-method.active');
-    if (!selectedMethod) {
-        isValid = false;
-        alert('Por favor, selecione um método de pagamento.');
-    } else {
-        const method = selectedMethod.getAttribute('data-method');
-        
-        // Validar campos específicos do método de pagamento
-        if (method === 'credit' || method === 'debit') {
-            const cardNumber = document.getElementById('card-number');
-            const cardName = document.getElementById('card-name');
-            const cardExpiry = document.getElementById('card-expiry');
-            const cardCvv = document.getElementById('card-cvv');
-            
-            if (!cardNumber.value || !cardName.value || !cardExpiry.value || !cardCvv.value) {
-                isValid = false;
-                
-                if (!cardNumber.value) cardNumber.classList.add('is-invalid');
-                if (!cardName.value) cardName.classList.add('is-invalid');
-                if (!cardExpiry.value) cardExpiry.classList.add('is-invalid');
-                if (!cardCvv.value) cardCvv.classList.add('is-invalid');
-            }
-        }
-    }
-    
     // Mostrar alerta de validação se necessário
     const validationAlert = document.getElementById('payment-validation-alert');
     validationAlert.style.display = isValid ? 'none' : 'block';
@@ -443,34 +417,5 @@ document.addEventListener('DOMContentLoaded', function() {
     const telefoneInput = document.getElementById('telefone');
     if (telefoneInput) {
         telefoneInput.addEventListener('input', formatPhone);
-    }
-    
-    // Formatar campos de cartão
-    const cardNumberInput = document.getElementById('card-number');
-    if (cardNumberInput) {
-        cardNumberInput.addEventListener('input', function() {
-            let value = cardNumberInput.value.replace(/\D/g, '');
-            value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
-            cardNumberInput.value = value;
-        });
-    }
-    
-    const cardExpiryInput = document.getElementById('card-expiry');
-    if (cardExpiryInput) {
-        cardExpiryInput.addEventListener('input', function() {
-            let value = cardExpiryInput.value.replace(/\D/g, '');
-            if (value.length > 2) {
-                value = value.substring(0, 2) + '/' + value.substring(2, 4);
-            }
-            cardExpiryInput.value = value;
-        });
-    }
-    
-    const cardCvvInput = document.getElementById('card-cvv');
-    if (cardCvvInput) {
-        cardCvvInput.addEventListener('input', function() {
-            let value = cardCvvInput.value.replace(/\D/g, '');
-            cardCvvInput.value = value.substring(0, 3);
-        });
     }
 });
