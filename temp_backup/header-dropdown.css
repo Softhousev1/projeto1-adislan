@@ -1,0 +1,114 @@
+/* Estilos adicionais para o dropdown de perfil no header */
+
+/* Estilo para o dropdown de perfil */
+.profile-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.user-profile-link {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: #f0ebeb;
+  padding: 5px 10px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.user-profile-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.profile-icon {
+  width: 28px;
+  height: 28px;
+  margin-right: 8px;
+}
+
+.welcome-message {
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-right: 5px;
+}
+
+/* Estilo para o conteúdo do dropdown */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  min-width: 200px;
+  background-color: white;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+  border-radius: 8px;
+  z-index: 1000;
+  overflow: hidden;
+  margin-top: 10px;
+  /* Adiciona uma área de buffer para facilitar o hover */
+  padding-top: 5px;
+}
+
+/* Criar área de buffer para evitar que o dropdown desapareça */
+.profile-dropdown:before {
+  content: "";
+  position: absolute;
+  height: 15px;
+  width: 100%;
+  bottom: -15px;
+  left: 0;
+}
+
+.dropdown-content a {
+  color: #333;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.2s;
+  font-size: 0.9rem;
+}
+
+.dropdown-content a:hover {
+  background-color: #f5f5f5;
+  color: #2b709e;
+}
+
+/* Classes para controlar a visibilidade do dropdown */
+.dropdown-content.show {
+  display: block;
+  animation: fadeIn 0.3s;
+}
+
+/* Mantém o comportamento hover para compatibilidade com atraso na saída */
+.profile-dropdown:hover .dropdown-content {
+  display: block;
+  animation: fadeIn 0.3s;
+}
+
+/* Adiciona atraso quando o mouse sai do dropdown */
+.profile-dropdown .dropdown-content {
+  transition: opacity 0.3s, visibility 0s 0.3s;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.profile-dropdown:hover .dropdown-content {
+  transition-delay: 0s;
+  opacity: 1;
+  visibility: visible;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Seta indicadora de dropdown */
+.user-profile-link i {
+  font-size: 0.8rem;
+  transition: transform 0.3s;
+}
+
+.profile-dropdown:hover .user-profile-link i,
+.profile-dropdown.active .user-profile-link i {
+  transform: rotate(180deg);
+}
