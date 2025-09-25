@@ -272,17 +272,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Aqui seria implementada a lógica de processamento do pagamento
-        // Por enquanto, apenas simulamos um checkout bem-sucedido
-        
-        alert('Compra finalizada com sucesso! Obrigado por comprar conosco.');
-        
-        // Limpar o carrinho
-        localStorage.setItem('carrinho', JSON.stringify([]));
-        
-        // Atualizar interface
-        updateCartCounter();
-        loadCart();
+        // Redirecionar para a página de pagamento
+        window.location.href = 'payment.html';
     }
 });
 
