@@ -52,12 +52,18 @@ async function loadProductDetails() {
       <h1>${escapeHtml(product.name)}</h1>
       <p class="price">R$ ${Number(product.price).toFixed(2)}</p>
       <p class="description">${escapeHtml(product.description || 'Nenhuma descrição disponível.')}</p>
-      <button id="addToCartBtn" class="add-to-cart-btn">Adicionar ao Carrinho</button>
+      <div class="product-actions">
+        <button id="addToCartBtn" class="add-to-cart-btn">Adicionar ao Carrinho</button>
+        <button id="addToWishlistBtn" class="add-to-wishlist-btn">
+          <i class="fas fa-heart"></i> Adicionar à Lista de Desejos
+        </button>
+      </div>
     </div>
   `;
 
-  // 5. Adicionar o event listener ao botão
+  // 5. Adicionar os event listeners aos botões
   document.getElementById('addToCartBtn').addEventListener('click', addToCart);
+  document.getElementById('addToWishlistBtn').addEventListener('click', addToWishlist);
 }
 
 // Atualiza o contador do carrinho na tela
@@ -92,6 +98,46 @@ function addToCart() {
   // Atualiza o contador e dá um feedback ao usuário
   atualizarContador();
   alert('Produto adicionado ao carrinho!');
+}
+
+// Adiciona o produto atual à lista de desejos
+function addToWishlist() {
+  if (!currentProduct) {
+    alert('Erro: Dados do produto não carregados.');
+    return;
+  }
+
+  // Verificar se o usuário está logado
+  const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+  if (!loggedInUser) {
+    alert('Por favor, faça login para adicionar produtos à lista de desejos.');
+    return;
+  }
+
+  // Obter dados do produto
+  const produtoParaAdicionar = {
+    id: currentProduct.id,
+    nome: currentProduct.name,
+    preco: currentProduct.price,
+    img: currentProduct.image_url
+  };
+  
+  // Obter lista de desejos atual
+  let wishlist = JSON.parse(localStorage.getItem(`wishlist_${loggedInUser.email}`)) || [];
+  
+  // Verificar se o produto já está na lista
+  const existingProduct = wishlist.find(item => item.id === produtoParaAdicionar.id);
+  if (existingProduct) {
+    alert('Este produto já está na sua lista de desejos.');
+    return;
+  }
+  
+  // Adicionar à lista de desejos
+  wishlist.push(produtoParaAdicionar);
+  localStorage.setItem(`wishlist_${loggedInUser.email}`, JSON.stringify(wishlist));
+  
+  // Feedback ao usuário
+  alert('Produto adicionado à lista de desejos!');
 }
 
 function escapeHtml(s) {

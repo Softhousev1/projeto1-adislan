@@ -124,7 +124,7 @@
                         </a>
                     </div>
                 </div>
-                <a href="#" class="icon-link">
+                <a href="checkout.html" class="icon-link">
                     <img src="./img/icons/carrinho-icone.png" alt="Ícone de Carrinho">
                     <span>Carrinho (<span id="carrinho-contador">0</span>)</span>
                 </a>
@@ -203,7 +203,7 @@
                     <img src="./img/icons/login.png" alt="Ícone de Login">
                     <span>Login</span>
                 </a>
-                <a href="#" class="icon-link">
+                <a href="checkout.html" class="icon-link">
                     <img src="./img/icons/carrinho-icone.png" alt="Ícone de Carrinho">
                     <span>Carrinho (<span id="carrinho-contador">0</span>)</span>
                 </a>
