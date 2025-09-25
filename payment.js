@@ -1,5 +1,9 @@
 // payment.js - Script para a página de pagamento
 
+// Configurações do Mercado Pago
+const MERCADO_PAGO_PUBLIC_KEY = 'APP_USR-38686b62-6d55-4c0f-8d9a-487f1a3bbb25';
+// As credenciais de acesso (access token, client id, client secret) devem ser usadas apenas no backend
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('[payment] Inicializando página de pagamento');
     
@@ -9,8 +13,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Configurar eventos
     setupCepSearch();
-    setupPaymentMethodSelection();
     setupFormValidation();
+    
+    // Inicializar Mercado Pago
+    initMercadoPago();
     
     // Botão finalizar pagamento
     document.getElementById('btn-finalizar-pagamento').addEventListener('click', processPayment);
@@ -157,39 +163,27 @@ function setupCepSearch() {
 }
 
 /**
- * Configura a seleção de método de pagamento
+ * Inicializa o Mercado Pago
  */
-function setupPaymentMethodSelection() {
-    const paymentMethods = document.querySelectorAll('.payment-method');
-    
-    // Adicionar evento de clique a cada método de pagamento
-    paymentMethods.forEach(method => {
-        method.addEventListener('click', function() {
-            // Remover classe 'active' de todos os métodos
-            paymentMethods.forEach(m => m.classList.remove('active'));
-            
-            // Adicionar classe 'active' ao método selecionado
-            this.classList.add('active');
-            
-            // Obter o método selecionado
-            const selectedMethod = this.getAttribute('data-method');
-            
-            // Esconder todos os campos de pagamento
-            document.querySelectorAll('.payment-fields').forEach(field => {
-                field.style.display = 'none';
-            });
-            
-            // Mostrar os campos do método selecionado
-            const selectedFields = document.getElementById(`${selectedMethod}-fields`);
-            if (selectedFields) {
-                selectedFields.style.display = 'block';
-            }
+function initMercadoPago() {
+    // Inicializar o SDK do Mercado Pago
+    if (typeof MercadoPago !== 'undefined') {
+        console.log('[payment] Inicializando SDK do Mercado Pago');
+        
+        // Configurar o SDK com a chave pública
+        const mp = new MercadoPago(MERCADO_PAGO_PUBLIC_KEY);
+        
+        // Salvar a instância para uso posterior
+        window.mercadoPagoInstance = mp;
+    } else {
+        console.error('[payment] SDK do Mercado Pago não carregado');
+        
+        // Adicionar um listener para verificar quando o SDK estiver disponível
+        window.addEventListener('mercadopago-loaded', function() {
+            console.log('[payment] SDK do Mercado Pago carregado posteriormente');
+            const mp = new MercadoPago(MERCADO_PAGO_PUBLIC_KEY);
+            window.mercadoPagoInstance = mp;
         });
-    });
-    
-    // Selecionar o primeiro método por padrão
-    if (paymentMethods.length > 0) {
-        paymentMethods[0].click();
     }
 }
 
@@ -285,7 +279,7 @@ function validateForm() {
 }
 
 /**
- * Processa o pagamento
+ * Processa o pagamento usando o Mercado Pago
  */
 function processPayment() {
     // Validar formulário
@@ -295,8 +289,14 @@ function processPayment() {
         if (firstInvalid) {
             firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
+        
+        // Mostrar alerta de validação
+        document.getElementById('payment-validation-alert').style.display = 'block';
         return;
     }
+    
+    // Ocultar alerta de validação
+    document.getElementById('payment-validation-alert').style.display = 'none';
     
     // Obter dados do formulário
     const formData = {
@@ -307,76 +307,116 @@ function processPayment() {
             cep: document.getElementById('cep').value,
             rua: document.getElementById('rua').value,
             numero: document.getElementById('numero').value,
-            complemento: document.getElementById('complemento').value,
+            complemento: document.getElementById('complemento').value || '',
             bairro: document.getElementById('bairro').value,
             cidade: document.getElementById('cidade').value,
             estado: document.getElementById('estado').value
-        },
-        metodoPagamento: document.querySelector('.payment-method.active').getAttribute('data-method')
+        }
     };
     
     // Obter dados do carrinho
     const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
     
-    // Preparar dados para envio
+    // Calcular valores
+    let subtotal = 0;
+    const items = carrinho.map(item => {
+        const price = parseFloat(item.preco);
+        subtotal += price;
+        
+        return {
+            id: item.id,
+            title: item.nome,
+            quantity: 1,
+            unit_price: price
+        };
+    });
+    
+    // Calcular frete
+    const shipping = subtotal > 0 && subtotal < 100 ? 10 : 0;
+    const total = subtotal + shipping;
+    
+    // Preparar dados para o Mercado Pago
     const paymentData = {
-        cliente: formData,
-        produtos: carrinho,
-        total: parseFloat(document.getElementById('total').textContent.replace('R$ ', ''))
+        items: items,
+        payer: {
+            name: formData.nome,
+            email: formData.email,
+            phone: {
+                area_code: formData.telefone.substring(1, 3),
+                number: formData.telefone.replace(/\D/g, '').substring(2)
+            },
+            address: {
+                zip_code: formData.endereco.cep.replace('-', ''),
+                street_name: formData.endereco.rua,
+                street_number: formData.endereco.numero
+            }
+        },
+        shipments: {
+            cost: shipping,
+            mode: "custom"
+        },
+        back_urls: {
+            success: window.location.origin + "/index.html?payment=success",
+            failure: window.location.origin + "/payment.html?status=failure",
+            pending: window.location.origin + "/index.html?payment=pending"
+        },
+        auto_return: "approved",
+        external_reference: "ORDER_" + new Date().getTime()
     };
     
-    console.log('[payment] Processando pagamento:', paymentData);
+    console.log('[payment] Dados para o Mercado Pago:', paymentData);
     
-    // Simular chamada à API de pagamento
-    simulatePaymentAPI(paymentData);
-}
-
-/**
- * Simula uma chamada à API de pagamento
- * @param {Object} data Dados do pagamento
- */
-function simulatePaymentAPI(data) {
     // Desabilitar botão de pagamento e mostrar loading
     const paymentButton = document.getElementById('btn-finalizar-pagamento');
     const originalText = paymentButton.textContent;
     paymentButton.disabled = true;
-    paymentButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processando...';
+    paymentButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Redirecionando para pagamento...';
     
-    // Simular delay de processamento
+    // Em um ambiente real, aqui seria feita uma chamada ao backend para criar a preferência
+    // O backend usaria o access token para criar a preferência e retornaria o ID
+    // Aqui estamos simulando esse processo
+    
+    // Simular uma chamada ao backend
     setTimeout(() => {
-        // Em um ambiente real, aqui seria feita uma chamada fetch para a API de pagamento
-        // fetch('/api/pagamento', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     },
-        //     body: JSON.stringify(data)
-        // })
-        
-        // Simular sucesso
-        const success = Math.random() > 0.2; // 80% de chance de sucesso
-        
-        if (success) {
+        try {
             // Salvar endereço no localStorage para uso futuro
             const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser')) || {};
-            loggedInUser.endereco = data.cliente.endereco;
+            loggedInUser.endereco = formData.endereco;
             localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
             
-            // Limpar carrinho
-            localStorage.setItem('carrinho', JSON.stringify([]));
-            
-            // Redirecionar para página de confirmação
-            alert('Pagamento processado com sucesso! Você será redirecionado para a página de confirmação.');
-            window.location.href = 'index.html?payment=success';
-        } else {
-            // Simular erro
-            alert('Erro ao processar pagamento. Por favor, verifique seus dados e tente novamente.');
+            // Simular redirecionamento para o Mercado Pago
+            redirectToMercadoPago(paymentData);
+        } catch (error) {
+            console.error('[payment] Erro ao processar pagamento:', error);
+            alert('Erro ao processar pagamento. Por favor, tente novamente mais tarde.');
             
             // Restaurar botão
             paymentButton.disabled = false;
             paymentButton.textContent = originalText;
         }
-    }, 2000);
+    }, 1500);
+}
+
+/**
+ * Redireciona para o checkout do Mercado Pago
+ * @param {Object} paymentData Dados do pagamento
+ */
+function redirectToMercadoPago(paymentData) {
+    // Em um ambiente real, o backend retornaria o ID da preferência
+    // Aqui estamos simulando esse processo
+    
+    // Limpar carrinho após redirecionamento
+    localStorage.setItem('carrinho', JSON.stringify([]));
+    
+    // Redirecionar para uma URL simulada do Mercado Pago
+    // Em produção, isso seria gerado pelo backend usando o SDK do Mercado Pago
+    const mercadoPagoUrl = `https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=SIMULATED_${Date.now()}`;
+    
+    // Mostrar uma mensagem antes de redirecionar
+    alert('Você será redirecionado para o ambiente seguro do Mercado Pago para finalizar seu pagamento.');
+    
+    // Redirecionar
+    window.location.href = 'index.html?payment=redirect';
 }
 
 /**
