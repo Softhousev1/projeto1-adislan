@@ -1,287 +1,592 @@
+/*
+  STYLE.CSS - Folha de Estilos Principal
+  --------------------------------------
+  Este arquivo contém todos os estilos para a parte pública do site Moda Online.
 
-      /* reset css */
-      * {box-sizing: border-box; margin: 0; padding: 0;
-        a{
-            text-decoration: none;
-            color: rgb(255, 255, 255);
-        }
-    
+  Índice:
+  1. Reset e Estilos Globais
+  2. Estrutura do Cabeçalho (Header)
+  3. Carrossel de Slides (Página Inicial)
+  4. Grid de Produtos (Página Inicial)
+  5. Página de Detalhes do Produto
+  6. Estrutura do Rodapé (Footer)
+  7. Estilos de Formulário (Cadastro)
+  8. Responsividade
+*/
+
+/* --- 1. Reset e Estilos Globais --- */
+* {
+    box-sizing: border-box; 
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif; 
+    background-color: #5a6c7a;
+    padding-top: 80px; /* Adiciona espaço para o header fixo */
+}
+
+a {
+    text-decoration: none;
+    color: rgb(255, 255, 255);
+}
+
+main {
+    width: 100%;
+    max-width: 100%;
+    margin: auto;
+}
+
+/* --- 2. Estrutura do Cabeçalho (Header) --- */
+.main-header {
+    background: linear-gradient(to bottom, #2b709e, #5a6c7a);
+    color: white;
+    padding: 0 20px;
+    height: 80px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.main-header .logo a {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.main-header .logo img {
+    height: 60px;
+    width: auto;
+    display: block;
+    margin: 0 0 0 8px; /* Pequeno espaçamento à esquerda se necessário */
+}
+
+.main-header .main-nav ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.main-header .main-nav li {
+    margin: 0 20px;
+}
+
+.main-header .main-nav a {
+    color: #f0ebeb;
+    text-decoration: none;
+    font-size: 1.1rem;
+    padding: 5px 0;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.3s;
+}
+
+.main-header .main-nav a:hover {
+    border-bottom-color: #73c5eb;
+    color: #fff;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+}
+
+.search-bar input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px 0 0 5px;
+    width: 300px;
+    outline: none;
+}
+
+.search-bar button {
+    padding: 10px 15px;
+    background-color: #063866;
+    color: white;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+}
+
+.user-icons {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Reduzido para acomodar o texto */
+}
+
+.welcome-message {
+    color: #f0ebeb;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+/* --- Dropdown de Perfil --- */
+.profile-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.profile-dropdown .icon-link {
+    cursor: pointer;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 8px;
+    overflow: hidden; /* Garante que os cantos dos links fiquem arredondados */
+    right: 0; /* Alinha o dropdown à direita */
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 0.9rem;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.profile-dropdown:hover .dropdown-content {
+    display: block;
+}
+
+
+.user-icons .icon-link {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    text-decoration: none;
+    color: #f0ebeb;
+    font-size: 0.8rem;
+}
+
+.user-icons .icon-link img {
+    width: 28px;
+    height: 28px;
+    margin-bottom: 4px;
+}
+
+.user-icons .icon-link span {
+  margin-left: 0;
+}
+
+.user-icons .icon-link:hover {
+    color: #73c5eb;
+}
+
+/* --- 3. Carrossel de Slides (Página Inicial) --- */
+.caixa1 {
+    background-color: #5a6c7a; 
+    padding: 50px; 
+    border-radius: 5px; 
+    width: 100%;
+}
+
+.deck {
+    max-width: 980px;
+    margin: 20px auto;
+    padding: 32px;
+}
+
+.frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #111827;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+
+.slides-wrapper {
+    display: flex;
+    height: 100%;
+    transition: transform 0.5s ease-in-out;
+}
+
+.slide {
+    flex: 0 0 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.controls {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 14px;
+}
+
+.controls button {
+    border: 0;
+    padding: 10px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    background: #1f2937;
+    color: #e5e7eb;
+    font-weight: 600;
+    box-shadow: 0 6px 16px rgba(0,0,0,.25);
+}
+
+.controls button:hover {
+    filter: brightness(1.1);
+}
+
+.dots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #374151;
+    opacity: 0.6;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.dot.active {
+    opacity: 1;
+    background: #e5e7eb;
+    transform: scale(1.2);
+}
+
+/* --- 4. Grid de Produtos (Página Inicial) --- */
+.produtos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.produto {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 16px;
+    text-align: center;
+    width: calc(33.333% - 20px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.produto img {
+    width: 100%;
+    max-width: 180px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 12px;
+}
+
+.btn-comprar {
+    font-size: 0.9em;
+    padding: 8px 18px;
+    border-radius: 4px;
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    margin-top: auto;
+    transition: background-color 0.2s;
+}
+
+.btn-comprar:hover {
+    background-color: #0056b3;
+}
+
+.product-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+/* --- 5. Página de Detalhes do Produto --- */
+.product-container {
+  display: flex;
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  gap: 40px;
+}
+
+.product-image-gallery {
+  flex: 1;
+  max-width: 50%;
+}
+
+.product-image-gallery img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.product-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-details .category {
+  font-size: 0.9em;
+  color: #888;
+  margin-bottom: 10px;
+}
+
+.product-details h1 {
+  font-size: 2.5em;
+  margin: 0 0 20px 0;
+}
+
+.product-details .price {
+  font-size: 2em;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.product-details .description {
+  font-size: 1em;
+  line-height: 1.6;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.add-to-cart-btn {
+  background-color: #27ae60;
+  color: white;
+  padding: 15px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  text-transform: uppercase;
+  font-weight: bold;
+  margin-top: auto;
+}
+
+.add-to-cart-btn:hover {
+  background-color: #229954;
+}
+
+.loader {
+  border: 8px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 8px solid #3498db;
+  width: 60px;
+  height: 60px;
+  animation: spin 2s linear infinite;
+  margin: 50px auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* --- 6. Estrutura do Rodapé (Footer) --- */
+footer {
+    background: linear-gradient(to bottom,#5a6c7a, #2b709e); 
+    color: rgb(12, 11, 11); 
+    text-align: center; 
+    padding: 50px; 
+    position: relative; 
+    bottom: 0; 
+    width: 100%;
+}
+
+footer .icones {
+    display: flex;
+    justify-content: center;
+    margin-top: 2px;
+    gap: 10px;
+}
+
+/* --- 7. Estilos de Formulário (Cadastro) --- */
+.cadastro-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    background-color: #5a6c7a;
+}
+
+.cadastro-container .card {
+    background: linear-gradient(#3180b4, #243c4d);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+    color: white;
+    width: 100%;
+    max-width: 500px;
+    margin: 20px 0;
+}
+
+.cadastro-container .card h1 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #dbdee7;
+}
+
+.cadastro-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.cadastro-container .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.cadastro-container label {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #d6dbe4;
+}
+
+.cadastro-container input {
+    padding: 0.8rem;
+    border-radius: 5px;
+    border: 1px solid #5a6c7a;
+    background-color: #f0f2f5;
+    outline: none;
+    width: 100%;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.cadastro-container input:focus {
+    border-color: #73c5eb;
+    box-shadow: 0 0 5px rgba(115, 197, 235, 0.5);
+}
+
+.cadastro-container button[type="submit"] {
+    background-color: #097dca;
+    color: white;
+    width: 100%;
+    padding: 0.8rem;
+    border: none;
+    font-size: 1.1rem;
+    font-weight: 500;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.cadastro-container button[type="submit"]:hover {
+    background-color: #0e1936;
+    box-shadow: 0 0 8px #039eff;
+}
+
+/* --- PÁGINA DE LOGIN --- */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    background-color: #5a6c7a;
+    min-height: calc(100vh - 80px); /* 100% da altura da viewport menos o header */
+}
+
+.login-container .card {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+    color: #333;
+    width: 100%;
+    max-width: 500px;
+    margin: 20px 0;
+}
+
+/* --- Notificação Toast --- */
+.toast-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #28a745; /* Fundo verde para sucesso */
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.5s ease;
+}
+
+.toast-notification.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+
+/* --- PÁGINA DE CADASTRO (Ajustes para Bootstrap) --- */
+.cadastro-container .card {
+    color: #333; /* Texto escuro para melhor contraste em fundo branco */
+}
+
+.cadastro-container .card h1 {
+    color: #333; /* Texto escuro para melhor contraste */
+}
+
+
+/* --- 8. Responsividade --- */
+@media (max-width: 992px) {
+    .produto {
+        width: calc(50% - 20px); /* 2 colunas em tablets */
     }
+}
 
-    /* Aqui é a pagina do menu principal Index */
-    .logo {
-        width: 150px;
-        height: auto;
-        font-family: Arial, sans-serif;
-    ;
-
-      }
-      .logo img {
-        
-        display: flex;
-        margin-left: -550px; /* move para a esquerda */
-        margin-top: -20px;  /* move para cima */
-        width: 180%;
-        height: auto;
-      }
-      body {font-family: Arial, sans-serif; background-color: #5a6c7a; max-width: 100%; width: 100%;}
-
-        /* MENU*/
-
-      .top {
-        background: linear-gradient(to bottom, #2b709e, #5a6c7a); 
-        color: rgb(12, 11, 11); padding: 10px; height: 120px; width: 100%;
-         text-align: center; position: fixed; top: 0; z-index: 1000;display :flex
+@media (max-width: 768px) {
+    .produto {
+        width: 100%; /* 1 coluna em celulares */
     }
-    .top {
-      background: linear-gradient(to bottom, #2b709e, #5a6c7a); 
-      color: rgb(12, 11, 11); 
-      padding: 10px; 
-      height: 120px; 
-      width: 100%;
-      text-align: center; 
-      position: fixed; 
-      top: 0; 
-      z-index: 1000;
-      display: flex;
-      justify-content: center; /* centraliza horizontalmente */
-      align-items: center;     /* centraliza verticalmente */
+    .product-container {
+        flex-direction: column;
     }
-    .top input, .top button {
-      height: 40px;
-      margin-left: 0;
-      margin-right: 0;
-      display: inline-block;
-      vertical-align: middle;
-      position: relative;
+    .product-image-gallery {
+        max-width: 100%;
     }
-    .categorias-menu {
-      display: block;
-      justify-content: center;
-      align-items: center;
-      gap: 20px;
-      margin-top: 50px;
-      margin-left: 60px; 
-    }
-    nav ul {
-        list-style: none; padding: 20px; margin: 0; display: flex; justify-content: center;}
-      nav ul li {margin: 0 15px; color: #110d0d;}
-      nav a {text-decoration: none; color: #f0ebeb;}
-      a:hover {text-decoration: underline; color: #73c5eb;}
-
-      input[type="text"] {padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 400px;}
-      #botao-pesquisar {padding: 10px 10px;
-        box-shadow: 2px 2px 5px rgb(60, 67, 77);
-         background-color: #063866; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;
-         width: 100px;
-        
-        
-        }
-
-    #icone-login {
-      display: flex;
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      align-items: center;
-      z-index: 1100;
-    }
-    #icone-login img {
-      width: 30px;
-      height: 30px;
-      
-    }
-    #icone-login{
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-    }
-
-    #icone-carrinho img {
-      width: 30px;
-      height: 30px;
-      margin-left: 1rem;
-    }
-    .bot-icone{
-      background-color: blanchedalmond;
-      display: block;
-    }
-    .login-cadastre-se{
-      color: #e6eaee;
-      padding: 0.5rem;
-    }
-
-/* MENU */
-
- 
-/* Rodapé */
-      footer {background: linear-gradient(to bottom,#5a6c7a, #2b709e); color: rgb(12, 11, 11); text-align: center; padding: 50px; position: relative; bottom: 0; width: 100%; max-width: 100%;}
-
-    .icones {
-        display: flex;
-        justify-content: center;
-        margin-top: 2px ;
-        gap: 10px;
-    }
-    /* Rodapé */
-    
-      /*Conteudo---------*/
-
-      /* carrossel_de_fotos-------- */
-      .caixa1 {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 50rem;
-    }
-
-    .deck {
-      width: 50%;
-      height: auto;
-      
-      position: relative;
-    }
-
-    .frame {
-      overflow: hidden;
-      width: 100%;
-    }
-
-    .slides-wrapper {
-      display: flex;
-      transition: transform 0.5s ease;
-      width: 100%;
-    }
-
-    .slide {
-      min-width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items:center;
-    }
-
-    .slide img {
-      object-fit: cover;
-      object-position: center;
-      width: 100%;
-      max-height: 40rem;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 1rem;
-    }
-
-    .controls {
-      display: flex;
-      gap: 6rem;
-    }
-    .controls button {
-      background-color: rgba(0, 0, 0, 0.5);
-      color: white;
-      border: none;
-      padding: 10px;
-      cursor: pointer;
-      font-size: 20px;
-      pointer-events: auto;
-    }
-
-    .dots {
-      position: absolute;
-      bottom: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 8px;
-    }
-
-    .dots span {
-      height: 12px;
-      width: 12px;
-      border-radius: 50%;
-      background-color: gray;
-      cursor: pointer;
-    }
-
-    .dots .active {
-      background-color: black;
-    }
-
-/* termina a pagina do menu principal Index.html */
-        
-
-        /* aqui começa a pagina de cadastro */
-
-
-        main{
-            /* background-color: aquamarine; */
-            height: auto;
-            width: auto;
-            max-width: 100%;
-            margin: auto;
-            justify-content: center;
-        }
-        /* Card da pagina cadastro  */
-      .card{
-            /* background-color:#ac7171; */
-            background: linear-gradient(#3180b4,#243c4d);
-            width: 40%;
-            max-width: 100%;
-            height: 65%;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            border-radius: 20px;
-            border:none;
-            box-shadow: 2px 2px 6px #444040ea;
-            margin: 10% auto 100px auto;
-        }
-
-        .card h1{
-            text-align: center;
-            color: #dbdee7
-        }
-
-
-
-
-
-        /* Formulário pagina de cadastro */
-      form{
-            /* background-color: brown; */
-            display: flex;
-            flex-direction: column;
-        }
-
-         input{
-            padding: 0.8rem;
-            border-radius: 5px;
-            border: none;
-            outline: none;
-        }
-        button{
-            background-color: #097dca;
-            width: 100%;
-            padding: 0.8rem 5rem;
-            border: none;
-            font-size: 1rem;
-            font-weight: 500;
-            text-align: center;
-            border-radius: 20px;
-            cursor: pointer;
-        }
-        button:hover{
-            transition: background-color 0.2s;
-            background-color: #0e193680;
-            box-shadow: 0px 0px 8px #039eff;
-        }
-        form h1{
-            color: #dbdee7;
-        }
-
-        label{
-            color:rgb(214, 219, 228);
-            font-size: 0.8rem;
-        }
-
-   
+}

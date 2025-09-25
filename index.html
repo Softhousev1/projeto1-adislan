@@ -3,77 +3,83 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Checkout + Slides</title>
+    <title>Moda Online</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Estilos para o dropdown de perfil -->
+    <link rel="stylesheet" href="header-dropdown.css">
   </head>
   <body>
 <!-- Menu superior -->
-<header>    
-<div class="top"> 
-      <div class="logo">
-        <a href="./index.html"><img src="./img/download.svg" alt="Logo da Empresa"></a>
-
-        
-      </div> 
-     
-      <nav> 
+<header class="main-header">
+    <div class="logo">
+        <a href="./index.html"><img src="./img/icons/logo.png" alt="Logo da Empresa"></a>
+    </div>
+    <nav class="main-nav">
         <ul>
-          <li><a href="#">Início</a></li>
-          <li><a href="#">Sobre</a></li>
-      </nav>
-     <input type="text" placeholder="Pesquisar...">
-      <button id="botao-pesquisar">Pesquisar</button>
-      
-      <div class="bot-icones">
+            <li><a href="./index.html">Início</a></li>
+            <li><a href="./sobreosite.html">Sobre</a></li>
+            
+        </ul>
+    </nav>
+    <div class="search-bar">
+        <input type="text" placeholder="Pesquisar...">
+        <button id="botao-pesquisar">Pesquisar</button>
+    </div>
+    <div class="user-icons">
+        <a href="./login.html" class="icon-link">
+            <img src="./img/icons/login.png" alt="Ícone de Login">
+            <span>Login</span>
+        </a>
+        <a href="#" class="icon-link">
+            <img src="./img/icons/carrinho-icone.png" alt="Ícone de Carrinho">
+            <span>Carrinho (<span id="carrinho-contador">0</span>)</span>
+        </a>
+    </div>
+</header>
+<!-- Menu superior -->
 
-        <div id="icone-login">
-          <a href="./login.html"><img src="./img/icons/login.png" alt="Ícone de Login"></a>
-          <div class="login-cadastre-se">Casdastre-se</div>
-        </div>
+  <!-- Inclusão do Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        <div id="icone-carrinho">
-          <a href="./login.html"><img src="./img/carrinho-icone.png" alt="Ícone de Carrinho"></a>
-        </div>
-      </div>
-       </ul>
-      </nav>
-    </header>
-    <!-- Menu superior -->
-
-    <!-- Conteudo -->
-   
-    <!-- SLIDES INSERIDOS AQUI -->
+  <main>
     <div class="caixa1">
+      <!-- SLIDES INSERIDOS AQUI -->
       <div class="deck">
         <div class="frame">
           <div class="slides-wrapper" id="slidesWrapper">
             <!-- SLIDE 1 -->
             <section class="slide">
-              <img src="./img/redimencionado/redimensionada_Sapato M (3).png" />
+              <img src="./img/redimencionado/redimensionada_Sapato-M-(3).png" alt="Sapato Masculino" />
             </section>
 
             <!-- SLIDE 2 -->
             <section class="slide">
-              <img src="./img/redimencionado/redimensionada_Moletom M (4).png" />
+              <img src="./img/redimencionado/redimensionada_Moletom-M-(4).png" alt="Moletom Masculino" />
             </section>
 
             <!-- SLIDE 3 -->
             <section class="slide">
-              <img src="./img/redimencionado/redimensionada_Camisa F (4).png" />
+              <img src="./img/redimencionado/redimensionada_Camisa_F_(4).png" alt="Camisa Feminina" />
             </section>
           </div>
         </div>
 
         <div class="controls">
           <button id="prev" aria-label="Slide anterior">⟵</button>
+          <div class="dots" id="dots"></div>
           <button id="next" aria-label="Próximo slide">⟶</button>
         </div>
-
-        <div class="dots" id="dots"></div>
       </div>
     </div>
-      
+      <!-- Produtos  -->
+      <div class="produtos" id="product-list">
+        <!-- Os produtos estáticos serão removidos e esta seção será populada pelo main.js -->
+      </div>
    
+    
+
 <!-- Rodapé -->
     <footer>
       <div class="icones"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-facebook" viewBox="0 0 16 16">
@@ -88,86 +94,68 @@
       </div>
       <p>&copy; 2025 Todos os direitos reservados.</p>
       <p>Email: contato@exemplo.com</p>
-      <p>Telefone: (11) 1234-5678</p>
+      <p>Telefone: (69) 1234-5678</p>
       <p>Pagamento: Cartão de Crédito</p>
+      <p><a href="./contato.html" style="color: #141414; text-decoration: none;">Fale conosco</a></p>
     </footer>
 
     <script>
-      // const deck = document.getElementById('deck');
-      // const slides = Array.from(deck.querySelectorAll('.slide'));
-      // const nextBtn = document.getElementById('next');
-      // const prevBtn = document.getElementById('prev');
-      // const dotsWrap = document.getElementById('dots');
-
-      // let i = 0;
-      // const update = () => {
-      //   slides.forEach((s, idx)=> s.classList.toggle('active', idx===i));
-      //   dotsWrap.querySelectorAll('.dot').forEach((d, idx)=> d.classList.toggle('active', idx===i));
-      //   document.title = 'Slide: ' + (slides[i].dataset.title || (i+1));
-      // }
-
-      // // dots
-      // slides.forEach((_, idx) => {
-      //   const d = document.createElement('div');
-      //   d.className = 'dot' + (idx===0?' active':'');
-      //   d.addEventListener('click', ()=>{ i = idx; update(); });
-      //   dotsWrap.appendChild(d);
-      // });
-
-      // nextBtn.addEventListener('click', ()=>{ i = (i+1) % slides.length; update(); });
-      // prevBtn.addEventListener('click', ()=>{ i = (i-1+slides.length) % slides.length; update(); });
-
-      // addEventListener('keydown', (e)=>{
-      //   if(e.key==='ArrowRight' || e.key==='PageDown' || e.key===' ') { i = (i+1) % slides.length; update(); }
-      //   if(e.key==='ArrowLeft'  || e.key==='PageUp' ) { i = (i-1+slides.length) % slides.length; update(); }
-      // });
-
-      // let auto = setInterval(()=>{ i = (i+1) % slides.length; update(); }, 6000);
-      // deck.addEventListener('mouseenter', ()=> clearInterval(auto));
-
-    
-      let currentSlide = 0;
-      const slides = document.querySelectorAll('.slide');
-      const totalSlides = slides.length;
+      // --- LÓGICA DO NOVO CARROSSEL ---
       const slidesWrapper = document.getElementById('slidesWrapper');
-      const prevButton = document.getElementById('prev');
-      const nextButton = document.getElementById('next');
+      const slides = Array.from(slidesWrapper.querySelectorAll('.slide'));
+      const nextBtn = document.getElementById('next');
+      const prevBtn = document.getElementById('prev');
       const dotsContainer = document.getElementById('dots');
 
-      // Cria os dots
-      for (let i = 0; i < totalSlides; i++) {
-        const dot = document.createElement('span');
-        dot.addEventListener('click', () => goToSlide(i));
-        dotsContainer.appendChild(dot);
-      }
+      let currentIndex = 0;
+      const totalSlides = slides.length;
 
-      const dots = document.querySelectorAll('#dots span');
+      // Criar os dots
+      slides.forEach((_, index) => {
+        const dot = document.createElement('button');
+        dot.classList.add('dot');
+        dot.addEventListener('click', () => {
+          goToSlide(index);
+        });
+        dotsContainer.appendChild(dot);
+      });
+
+      const dots = Array.from(dotsContainer.querySelectorAll('.dot'));
 
       function updateCarousel() {
-        const offset = -currentSlide * 100;
-        slidesWrapper.style.transform = `translateX(${offset}%)`;
-
-        dots.forEach(dot => dot.classList.remove('active'));
-        dots[currentSlide].classList.add('active');
+        slidesWrapper.style.transform = `translateX(-${currentIndex * 100}%)`;
+        dots.forEach((dot, index) => {
+          dot.classList.toggle('active', index === currentIndex);
+        });
       }
 
       function goToSlide(index) {
-        currentSlide = index;
+        currentIndex = index;
         updateCarousel();
       }
 
-      prevButton.addEventListener('click', () => {
-        currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+      nextBtn.addEventListener('click', () => {
+        currentIndex = (currentIndex + 1) % totalSlides;
         updateCarousel();
       });
 
-      nextButton.addEventListener('click', () => {
-        currentSlide = (currentSlide + 1) % totalSlides;
+      prevBtn.addEventListener('click', () => {
+        currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
         updateCarousel();
       });
 
       // Inicia o carrossel
       updateCarousel();
+      
+      // Avanço automático
+      let autoSlide = setInterval(() => {
+        nextBtn.click();
+      }, 5000);
+
     </script>
+    <!-- Script para carregar os produtos dinamicamente -->
+    <script src="main.js"></script>
+    <!-- Script para UI de autenticação -->
+    <script src="auth-ui.js"></script>
   </body>
 </html>
