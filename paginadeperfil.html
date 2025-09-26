@@ -201,26 +201,8 @@
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   
-  <!-- Supabase - Usando ESM para garantir que o cliente seja inicializado corretamente -->
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-    
-    // Inicialização do Supabase
-    const supabaseUrl = 'https://hylttfhaedvytykjpeze.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5bHR0ZmhhZWR2eXR5a2pwZXplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTE1MDgsImV4cCI6MjA3NDI4NzUwOH0.e0BmMYbBC9QBI6TNsKgWUckFqCPnjPGEAq6-7h1W18A';
-    
-    // Criar cliente Supabase e disponibilizá-lo globalmente
-    window.supabaseClient = createClient(supabaseUrl, supabaseKey);
-    
-    console.log('[perfil] Cliente Supabase inicializado via ESM');
-    
-    // Verificar se o cliente foi inicializado corretamente
-    if (window.supabaseClient && window.supabaseClient.auth && typeof window.supabaseClient.auth.getSession === 'function') {
-      console.log('[perfil] Cliente Supabase inicializado com sucesso - método getSession disponível');
-    } else {
-      console.error('[perfil] ERRO: Cliente Supabase não foi inicializado corretamente');
-    }
-  </script>
+  <!-- Cliente Supabase Centralizado -->
+  <script type="module" src="supabase-client.js"></script>
   
   <!-- Script auth-ui.js deve ser carregado após a inicialização do Supabase -->
   <script src="auth-ui.js"></script>
@@ -878,8 +860,51 @@
             } finally {
               avatarOverlay.style.display = 'none';
               avatarSpinner.style.display = 'none';
+        const file = document.getElementById('fileInput').files[0];
+
+        if (file) {
+          console.log('[perfil] Nova imagem detectada para upload.');
+          try {
+            // Mostrar overlay e spinner durante o upload
+            avatarOverlay.style.display = 'block';
+            avatarSpinner.style.display = 'block';
+
+            // Remove a imagem antiga se existir
+            const { data: { avatar_url: oldAvatar } } = await supabaseClient.from('profiles').select('avatar_url').eq('id', currentUserId).single();
+            if (oldAvatar) {
+              const oldFileName = oldAvatar.split('/').pop();
+              await supabaseClient.storage.from('profiles').remove([oldFileName]);
+              console.log('[perfil] Imagem antiga removida do storage.');
             }
             */
+
+            // Faz o upload da nova imagem
+            const fileName = `${currentUserId}_${Date.now()}_${file.name}`;
+            const { data: uploadData, error: uploadError } = await supabaseClient
+              .storage
+              .from('profiles') // Nome do seu bucket de avatares
+              .upload(fileName, file, {
+                cacheControl: '3600',
+                upsert: true
+              });
+
+            if (uploadError) throw uploadError;
+
+            // Obter URL pública do avatar
+            const { data: { publicUrl } } = supabaseClient.storage.from('profiles').getPublicUrl(uploadData.path);
+
+            // Atualizar avatar_url no perfil
+            await supabaseClient
+              .from('profiles')
+              .update({ avatar_url: publicUrl })
+              .eq('id', currentUserId);
+
+          } catch (error) {
+            console.error('[perfil] Erro ao fazer upload da imagem:', error);
+            showMessage("Perfil salvo, mas houve um erro ao enviar a imagem.", "warning");
+          } finally {
+            avatarOverlay.style.display = 'none';
+            avatarSpinner.style.display = 'none';
           }
         }
         
