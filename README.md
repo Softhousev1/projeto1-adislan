@@ -1,8 +1,21 @@
 Testar aplicação
+https://projeto1-adislan-1-git-thalya-adislans-projects.vercel.app/
+exclusivo da sua branch Thalia
 
 admin@modaatual.com
 admin123
 Adislan
+
+
+Clonar o projeto
+
+1.git status
+2.git branch        		verificar branch
+3.git checkout -b adislan    	mudar
+4.git add .       		prepara o commit
+5.git commit -m "Alteração   	faz o comit
+na pagina sobre"
+6.git push origin adislan         envia as alterações
 
 
 Quando criar branchs use: feat/adicionar-pagina-contato
