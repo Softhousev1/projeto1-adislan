@@ -1,3 +1,5 @@
+Clonar o projeto  
+
 1.git status
 2.git branch        		verificar branch
 3.git checkout -b adislan    	mudar
