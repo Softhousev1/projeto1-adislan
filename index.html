@@ -3,43 +3,47 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Checkout + Slides</title>
+    <title>Moda Online</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Estilos para o dropdown de perfil -->
+    <link rel="stylesheet" href="header-dropdown.css">
   </head>
   <body>
 <!-- Menu superior -->
 <header class="main-header">
     <div class="logo">
-        <a href="./index.html"><img src="./img/MO.png" alt="Logo da Empresa"></a>
+        <a href="./index.html"><img src="./img/icons/logo.png" alt="Logo da Empresa"></a>
     </div>
-
     <nav class="main-nav">
         <ul>
-            <li><a href="#">Início</a></li>
+            <li><a href="./index.html">Início</a></li>
             <li><a href="./sobreosite.html">Sobre</a></li>
+            
         </ul>
     </nav>
-
     <div class="search-bar">
         <input type="text" placeholder="Pesquisar...">
         <button id="botao-pesquisar">Pesquisar</button>
     </div>
-
     <div class="user-icons">
         <a href="./login.html" class="icon-link">
             <img src="./img/icons/login.png" alt="Ícone de Login">
             <span>Login</span>
         </a>
-        <a href="#" class="icon-link"> <!-- Atualizar o link do carrinho quando a página existir -->
+        <a href="#" class="icon-link">
             <img src="./img/icons/carrinho-icone.png" alt="Ícone de Carrinho">
-            <span>Carrinho</span>
+            <span>Carrinho (<span id="carrinho-contador">0</span>)</span>
         </a>
     </div>
 </header>
 <!-- Menu superior -->
 
-    <!-- Conteudo -->
-   
+  <!-- Inclusão do Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <main>
     <div class="caixa1">
       <!-- SLIDES INSERIDOS AQUI -->
       <div class="deck">
@@ -70,44 +74,8 @@
       </div>
     </div>
       <!-- Produtos  -->
-      <div class="produtos">
-        <div class="produto"> 
-          <img src="img/Blusas/Camisa M (4).png" alt="Calça ">
-          <h3>camisa masculina</h3> 
-          <p>R$ 100,00</p>
-          <button class="btn-comprar">Comprar</button>
-        </div>
-        <div class="produto">
-          <img src="img/Calças/Calças M (3).png" alt="Calça Masculina">
-          <h3>calça masculina</h3>
-          <p>R$ 150,00</p>
-          <button class="btn-comprar">Comprar</button>
-        </div>
-        <div class="produto">
-          <img src="img/Calças/Calças F (4).png" alt="Calça Feminina">
-          <h3>calça feminina</h3>
-          <p>R$ 150,00</p>
-          <button class="btn-comprar">Comprar</button>
-        </div>
-        <div class="produto">
-          <img src="img/Blusas/Camisa F (4).png" alt="Camisa Feminina">
-          <h3>camisa feminina</h3>
-          <p>R$ 130,00</p>
-          <button class="btn-comprar">Comprar</button>
-        </div>
-        <div class="produto">
-          <img src="img/Tênis/Sapato M (3).png" alt="Tênis Casual">
-          <h3>tênis casual</h3>
-          <p>R$ 120,00</p>
-          <button class="btn-comprar">Comprar</button>
-        </div>
-        <div class="produto">
-          <img src="img/Tênis/Sapato M (5).png" alt="Tênis Masculino">
-          <h3>tênis masculino</h3>
-          <p>R$ 180,00</p>
-          <button class="btn-comprar">Comprar</button>
-        </div>
-        
+      <div class="produtos" id="product-list">
+        <!-- Os produtos estáticos serão removidos e esta seção será populada pelo main.js -->
       </div>
    
     
@@ -126,7 +94,7 @@
       </div>
       <p>&copy; 2025 Todos os direitos reservados.</p>
       <p>Email: contato@exemplo.com</p>
-      <p>Telefone: (11) 1234-5678</p>
+      <p>Telefone: (69) 1234-5678</p>
       <p>Pagamento: Cartão de Crédito</p>
       <p><a href="./contato.html" style="color: #141414; text-decoration: none;">Fale conosco</a></p>
     </footer>
@@ -185,5 +153,9 @@
       }, 5000);
 
     </script>
+    <!-- Script para carregar os produtos dinamicamente -->
+    <script src="main.js"></script>
+    <!-- Script para UI de autenticação -->
+    <script src="auth-ui.js"></script>
   </body>
 </html>

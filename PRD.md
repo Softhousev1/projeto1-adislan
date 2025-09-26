@@ -40,7 +40,7 @@ Banco de Dados: PostgreSQL ou MongoDB
 
 Integrações: API de pagamento Mercado Pago
 
-Simonesimm commented 16 minutes ago @Simonesimm Simonesimm 16 minutes agoedited by Simonesimm Collaborator Author 📄 Documento de Requisitos do Produto (PRD)
+ Collaborator Author 📄 Documento de Requisitos do Produto (PRD)
 
 Visão Geral Nome do Projeto: Moda Online Objetivo: Desenvolver uma plataforma de e-commerce para venda de roupas.
 

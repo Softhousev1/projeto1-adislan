@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Gerenciar Usuários - Painel Admin</title>
+<link rel="stylesheet" href="admin.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <script>
+    const supabaseUrl = 'https://hylttfhaedvytykjpeze.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5bHR0ZmhhZWR2eXR5a2pwZXplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTE1MDgsImV4cCI6MjA3NDI4NzUwOH0.e0BmMYbBC9QBI6TNsKgWUckFqCPnjPGEAq6-7h1W18A'; 
+    const supa = supabase.createClient(supabaseUrl, supabaseKey);
+    window.supabase = window.supabase || supa;
+
+    const guardAdmin = async () => {
+      const { data: { session } } = await supa.auth.getSession();
+      if (!session) { window.location.href = '../login.html'; return; }
+      const { data: profile } = await supa
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+      if (!profile || profile.role !== 'admin') {
+        await supa.auth.signOut();
+        alert('Acesso negado.');
+        window.location.href = '../index.html';
+      }
+    };
+
+    guardAdmin();
+  </script>
+
+  <div class="app" id="app">
+    <aside>
+      <div class="brand">
+        <div class="avatar">MA</div>
+        <div>
+          <div class="username">Moda Online</div>
+          <div style="font-size:12px;color:var(--muted)">admin</div>
+        </div>
+      </div>
+      <nav>
+        <div class="nav-item" onclick="window.location.href='admin.html'">⟵ Voltar</div>
+      </nav>
+      <button class="logout" id="btnLogout">🚪 Sair</button>
+    </aside>
+
+    <main>
+      <header>
+        <h1>Gerenciar Usuários</h1>
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="online">Online</div>
+          <div style="width:34px;height:34px;border-radius:50%;background:#dbeafe"></div>
+        </div>
+      </header>
+
+      <section class="page active">
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+            <div style="width:60%"><p style="margin:0;color:var(--muted)">Liste, busque, pagine, altere papéis e remova usuários.</p></div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <button class="btn green" id="btnOpenAddUser">+ Adicionar Usuário</button>
+              <input id="searchInput" type="text" placeholder="Buscar por nome ou email" style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px;min-width:220px">
+              <button class="btn grey" id="btnSearch">Buscar</button>
+              <button class="btn" id="btnClear">Limpar</button>
+              <button class="btn" id="btnReload">Recarregar</button>
+              <div style="display:flex;gap:6px;align-items:center">
+                <span style="color:var(--muted);font-size:13px">Por página</span>
+                <select id="pageSize" style="padding:6px 8px;border:1px solid #e5e7eb;border-radius:8px">
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <table class="table" style="margin-top:16px">
+            <thead>
+              <tr>
+                <th>NOME</th>
+                <th>EMAIL</th>
+                <th>PAPEL</th>
+                <th>STATUS</th>
+                <th style="width: 250px;">AÇÕES</th>
+              </tr>
+            </thead>
+            <tbody id="usersBody"></tbody>
+          </table>
+
+          <div id="usersEmpty" class="empty" style="display:none;">
+            <div style="font-size:34px">👥</div>
+            <div style="margin-top:8px;font-weight:700">Nenhum usuário encontrado</div>
+          </div>
+
+          <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+            <div id="resultsInfo" style="color:var(--muted);font-size:13px"></div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button class="btn grey" id="btnPrev">Anterior</button>
+              <span id="pageIndicator" style="min-width:90px;text-align:center"></span>
+              <button class="btn grey" id="btnNext">Próxima</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal: Adicionar Usuário -->
+  <div id="addUserModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Adicionar Usuário</h2>
+        <span class="close-button" id="closeAddUser">×</span>
+      </div>
+      <div class="modal-body">
+        <form id="addUserForm">
+          <div class="form-row">
+            <div style="flex:1">
+              <label for="auName">Nome completo</label>
+              <input type="text" id="auName" placeholder="Ex: Maria Almeida" required>
+            </div>
+            <div style="flex:1">
+              <label for="auEmail">Email</label>
+              <input type="text" id="auEmail" placeholder="email@dominio.com" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div style="flex:1">
+              <label for="auPassword">Senha inicial</label>
+              <input type="text" id="auPassword" placeholder="Defina uma senha temporária" required>
+            </div>
+            <div style="flex:1">
+              <label for="auRole">Papel</label>
+              <select id="auRole">
+                <option value="user">Usuário</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div style="flex:1">
+              <label for="auStatus">Status</label>
+              <select id="auStatus">
+                <option value="active">Ativo</option>
+                <option value="inactive">Inativo</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row" style="justify-content:flex-end">
+            <button type="button" class="btn" id="btnCancelAddUser">Cancelar</button>
+            <button type="submit" class="btn green" id="btnSubmitAddUser">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const usersBody = document.getElementById('usersBody');
+    const usersEmpty = document.getElementById('usersEmpty');
+    const searchInput = document.getElementById('searchInput');
+    const btnSearch = document.getElementById('btnSearch');
+    const btnClear = document.getElementById('btnClear');
+    const btnReload = document.getElementById('btnReload');
+    const pageSizeEl = document.getElementById('pageSize');
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+    const pageIndicator = document.getElementById('pageIndicator');
+    const resultsInfo = document.getElementById('resultsInfo');
+    // Modal elements
+    const addUserModal = document.getElementById('addUserModal');
+    const btnOpenAddUser = document.getElementById('btnOpenAddUser');
+    const btnCancelAddUser = document.getElementById('btnCancelAddUser');
+    const closeAddUser = document.getElementById('closeAddUser');
+    const addUserForm = document.getElementById('addUserForm');
+    const auName = document.getElementById('auName');
+    const auEmail = document.getElementById('auEmail');
+    const auPassword = document.getElementById('auPassword');
+    const auRole = document.getElementById('auRole');
+    const auStatus = document.getElementById('auStatus');
+    const btnSubmitAddUser = document.getElementById('btnSubmitAddUser');
+    // Backend URL (pode sobrescrever via localStorage.setItem('backendUrl', 'http://localhost:3000'))
+    const backendUrl = localStorage.getItem('backendUrl') || 'http://localhost:3000';
+
+    let allUsers = [];
+    let filteredUsers = [];
+    let currentPage = 1;
+    let pageSize = parseInt(pageSizeEl ? pageSizeEl.value : '10', 10);
+
+    function renderUsers(rows){
+      usersBody.innerHTML = '';
+      if (!rows || rows.length === 0){
+        usersEmpty.style.display = 'flex';
+        resultsInfo.textContent = '0 resultados';
+        pageIndicator.textContent = '';
+        return;
+      }
+      usersEmpty.style.display = 'none';
+      rows.forEach(u => {
+        const tr = document.createElement('tr');
+        const displayName = u.full_name || u.name || '-';
+        const email = u.email || '-';
+        const role = u.role || 'user';
+        const status = u.status || 'active'; // 'active' ou 'inactive'
+        const safeName = (displayName || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const safeEmail = (email || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const isCurrentUser = supa.auth.user() && supa.auth.user().id === u.id;
+
+        tr.innerHTML = `
+          <td>${safeName}</td>
+          <td>${safeEmail}</td>
+          <td>
+            <select data-user-id="${u.id}" class="role-select" ${isCurrentUser ? 'disabled' : ''}>
+              <option value="user" ${role==='user'?'selected':''}>Usuário</option>
+              <option value="admin" ${role==='admin'?'selected':''}>Admin</option>
+            </select>
+          </td>
+          <td><span class="status-${status}">${status === 'active' ? 'Ativo' : 'Inativo'}</span></td>
+          <td>
+            <button class="btn grey" onclick="saveRole('${u.id}')" ${isCurrentUser ? 'disabled' : ''}>Salvar Papel</button>
+            <button class="btn ${status === 'active' ? 'red' : 'green'}" onclick="toggleUserStatus('${u.id}', '${status}')" ${isCurrentUser ? 'disabled' : ''}>
+              ${status === 'active' ? 'Desativar' : 'Ativar'}
+            </button>
+          </td>
+        `;
+        usersBody.appendChild(tr);
+      });
+    }
+
+    function applyFilter(){
+      const term = (searchInput ? searchInput.value : '').trim().toLowerCase();
+      if (!term){
+        filteredUsers = [...allUsers];
+      } else {
+        filteredUsers = allUsers.filter(u => {
+          const name = (u.full_name || u.name || '').toLowerCase();
+          const email = (u.email || '').toLowerCase();
+          return name.includes(term) || email.includes(term);
+        });
+      }
+      currentPage = 1;
+      renderPage();
+    }
+
+    function renderPage(){
+      const total = filteredUsers.length;
+      const totalPages = Math.max(1, Math.ceil(total / pageSize));
+      currentPage = Math.min(Math.max(1, currentPage), totalPages);
+      const start = (currentPage - 1) * pageSize;
+      const end = start + pageSize;
+      const rows = filteredUsers.slice(start, end);
+      renderUsers(rows);
+      pageIndicator.textContent = `Página ${currentPage} de ${totalPages}`;
+      resultsInfo.textContent = `${total} resultado${total===1?'':'s'}`;
+      btnPrev.disabled = currentPage <= 1;
+      btnNext.disabled = currentPage >= totalPages;
+    }
+
+    async function loadUsers(){
+      try {
+        // Primeira tentativa: direto do Supabase (cliente anon)
+        const { data, error } = await supa
+          .from('profiles')
+          .select('id, full_name, email, role, status')
+          .order('full_name', { ascending: true });
+        if (!error) {
+          allUsers = data || [];
+          applyFilter();
+          return;
+        }
+        console.warn('Falha no carregamento direto do Supabase, tentando backend...', error);
+      } catch (e){
+        console.warn('Exceção ao consultar Supabase direto, tentando backend...', e);
+      }
+
+      try {
+        const res = await fetch(`${backendUrl}/admin/users`, { method: 'GET' });
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+        const json = await res.json();
+        allUsers = json.users || [];
+        applyFilter();
+      } catch (e){
+        console.error('Erro ao carregar usuários via backend:', e);
+        alert('Não foi possível carregar usuários.');
+      }
+    }
+
+    async function saveRole(userId){
+      const select = document.querySelector(`select.role-select[data-user-id="${userId}"]`);
+      if (!select) return;
+      const newRole = select.value;
+      const { error } = await supa
+        .from('profiles')
+        .update({ role: newRole })
+        .eq('id', userId);
+      if (error){
+        console.error('Erro ao salvar papel:', error);
+        alert('Não foi possível atualizar o papel.');
+        return;
+      }
+      alert('Papel atualizado com sucesso!');
+      loadUsers();
+    }
+
+    async function toggleUserStatus(userId, currentStatus) {
+      const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+      const actionText = newStatus === 'inactive' ? 'desativar' : 'ativar';
+
+      if (!confirm(`Tem certeza que deseja ${actionText} este usuário?`)) return;
+
+      // Atualiza o status na tabela 'profiles'
+      const { error } = await supa
+        .from('profiles')
+        .update({ status: newStatus })
+        .eq('id', userId);
+
+      if (error) {
+        console.error(`Erro ao ${actionText} usuário:`, error);
+        alert(`Não foi possível ${actionText} o usuário.`);
+        return;
+      }
+
+      alert(`Usuário ${actionText} com sucesso!`);
+      loadUsers();
+    }
+
+    // A função deleteUser foi substituída por toggleUserStatus, que é mais segura.
+    // A exclusão real (deleteUser) exigiria uma função de servidor (Edge Function) para chamar a API de Admin do Supabase.
+    // async function deleteUser(userId) { ... }
+
+    // --- Adicionar Usuário (Modal) ---
+    function openAddUserModal(){
+      if (addUserModal){ addUserModal.style.display = 'block'; }
+      if (auName){ auName.focus(); }
+    }
+    function closeAddUserModal(){
+      if (addUserModal){ addUserModal.style.display = 'none'; }
+      if (addUserForm){ addUserForm.reset(); }
+    }
+
+    async function handleAddUserSubmit(e){
+      e.preventDefault();
+      const name = (auName?.value || '').trim();
+      const email = (auEmail?.value || '').trim();
+      const password = (auPassword?.value || '').trim();
+      const role = auRole?.value || 'user';
+      const status = auStatus?.value || 'active';
+
+      if (!name || !email || !password){
+        alert('Preencha nome, email e senha.');
+        return;
+      }
+
+      btnSubmitAddUser.disabled = true;
+      btnSubmitAddUser.textContent = 'Salvando...';
+      try {
+        const res = await fetch(`${backendUrl}/admin/users`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ full_name: name, email, password, role, status })
+        });
+        const data = await res.json().catch(()=>({}));
+        if (!res.ok){
+          console.error('Erro ao criar usuário:', data);
+          alert(data?.error || 'Não foi possível criar o usuário.');
+          return;
+        }
+        alert('Usuário criado com sucesso!');
+        closeAddUserModal();
+        loadUsers();
+      } catch(err){
+        console.error(err);
+        alert('Falha de rede ao criar usuário.');
+      } finally {
+        btnSubmitAddUser.disabled = false;
+        btnSubmitAddUser.textContent = 'Salvar';
+      }
+    }
+
+    if (btnOpenAddUser) btnOpenAddUser.addEventListener('click', openAddUserModal);
+    if (btnCancelAddUser) btnCancelAddUser.addEventListener('click', closeAddUserModal);
+    if (closeAddUser) closeAddUser.addEventListener('click', closeAddUserModal);
+    if (addUserModal) addUserModal.addEventListener('click', (e)=>{ if (e.target === addUserModal) closeAddUserModal(); });
+    if (addUserForm) addUserForm.addEventListener('submit', handleAddUserSubmit);
+
+
+    document.getElementById('btnLogout').onclick = async function(){
+      const { error } = await supa.auth.signOut();
+      if (error) {
+        console.error('Erro ao fazer logout:', error);
+      }
+      window.location.href = '../login.html';
+    };
+
+    if (btnSearch) btnSearch.addEventListener('click', applyFilter);
+    if (btnClear) btnClear.addEventListener('click', () => { if (searchInput){ searchInput.value=''; } applyFilter(); });
+    if (btnReload) btnReload.addEventListener('click', loadUsers);
+    if (pageSizeEl) pageSizeEl.addEventListener('change', () => { pageSize = parseInt(pageSizeEl.value,10); currentPage = 1; renderPage(); });
+    if (btnPrev) btnPrev.addEventListener('click', () => { currentPage -= 1; renderPage(); });
+    if (btnNext) btnNext.addEventListener('click', () => { currentPage += 1; renderPage(); });
+
+    loadUsers();
+  </script>
+</body>
+</html>
