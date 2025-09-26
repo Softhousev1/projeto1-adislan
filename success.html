@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compra Realizada com Sucesso! - Moda Online</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome para ícones -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- CSS personalizado -->
+  <link rel="stylesheet" href="./style.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .success-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: calc(100vh - 160px); /* Altura da tela menos header e footer */
+      text-align: center;
+    }
+    .success-card {
+      background: #fff;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      max-width: 500px;
+    }
+    .success-icon {
+      font-size: 5rem;
+      color: #28a745;
+      margin-bottom: 20px;
+      animation: pop-in 0.5s ease-out;
+    }
+    @keyframes pop-in {
+      0% { transform: scale(0); }
+      80% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    .btn-home {
+      background-color: #2b709e;
+      color: white;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <!-- Menu superior -->
+  <header class="main-header">
+    <div class="logo">
+      <a href="./index.html"><img src="./img/download.svg" alt="Logo da Empresa"></a>
+    </div>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="./index.html">Início</a></li>
+        <li><a href="./sobreosite.html">Sobre</a></li>
+        <li><a href="./contato.html">Contato</a></li>
+      </ul>
+    </nav>
+    <div class="user-icons">
+      <!-- Conteúdo preenchido pelo auth-ui.js -->
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <div class="success-container">
+    <div class="success-card">
+      <div class="success-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h1 class="mb-3">Pagamento Aprovado!</h1>
+      <p class="lead mb-4">Obrigado pela sua compra! Seu pedido foi recebido e está sendo processado. Você receberá um e-mail de confirmação em breve.</p>
+      <a href="index.html" class="btn btn-home btn-lg">Voltar para a Página Inicial</a>
+    </div>
+  </div>
+
+  <!-- Rodapé -->
+  <footer>
+    <p>&copy; 2025 Todos os direitos reservados.</p>
+  </footer>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    const supabaseUrl = 'https://hylttfhaedvytykjpeze.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5bHR0ZmhhZWR2eXR5a2pwZXplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTE1MDgsImV4cCI6MjA3NDI4NzUwOH0.e0BmMYbBC9QBI6TNsKgWUckFqCPnjPGEAq6-7h1W18A';
+    window.supabaseClient = createClient(supabaseUrl, supabaseKey);
+  </script>
+  
+  <!-- Script para limpar o carrinho e atualizar a UI -->
+  <script src="auth-ui.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Limpa o carrinho de compras após a compra ser bem-sucedida
+      localStorage.setItem('carrinho', JSON.stringify([]));
+      console.log('Carrinho limpo após sucesso no pagamento.');
+    });
+  </script>
+</body>
+</html>
