@@ -4,7 +4,7 @@ let state = {
   finances: [],
   users: [], // Adiciona estado para usuários
   orders: [],
-  currentUser: { role: null }, // Armazena o perfil do usuário logado
+  currentUser: { role: null, avatar_url: null }, // Armazena o perfil do usuário logado
 };
 
 // Carrega o estado do localStorage ao iniciar
@@ -27,12 +27,19 @@ function saveState() {
 
 // Navegação
 function navigate(e) {
+  e.preventDefault(); // Impede o comportamento padrão do link de recarregar a página
   const el = e.currentTarget;
-  const page = el.getAttribute("data-page");
+  const navItem = el.closest(".nav-item"); // Encontra o elemento <li> pai
+  if (!navItem) return;
+
+  const page = navItem.getAttribute("data-page");
+
+  // Remove a classe 'active' de todos os links e adiciona no clicado
   document
-    .querySelectorAll(".nav-item")
+    .querySelectorAll(".sidebar .nav-link")
     .forEach((n) => n.classList.remove("active"));
   el.classList.add("active");
+
   showPage(page);
 }
 
@@ -47,20 +54,95 @@ function showPage(page) {
     return;
   }
 
+  // REGRA DE ACESSO: Apenas 'admin' e 'manager' podem ver 'usuarios'
+  if (page === "usuarios" && !["admin"].includes(state.currentUser.role)) {
+    alert("Você não tem permissão para acessar esta página.");
+    showPage("panel"); // Redireciona para o painel principal
+    return;
+  }
+
   document.getElementById("pageTitle").innerText =
     page.charAt(0).toUpperCase() + page.slice(1);
   document.querySelectorAll(".page").forEach((p) => (p.style.display = "none"));
   const el = document.getElementById(page);
   if (el) el.style.display = "block";
 
-  document.querySelectorAll(".nav-item").forEach((n) => {
-    n.classList.toggle("active", n.getAttribute("data-page") === page);
+  // Garante que o item de menu correto esteja ativo
+  document.querySelectorAll(".sidebar .nav-link").forEach((link) => {
+    const navItem = link.closest(".nav-item");
+    link.classList.toggle(
+      "active",
+      navItem && navItem.getAttribute("data-page") === page
+    );
   });
   refreshUI();
 }
 
 function showReport() {
-  alert("Funcionalidade de Relatórios em desenvolvimento.");
+  showToast("Funcionalidade de Relatórios em desenvolvimento.", "info");
+}
+
+// --- Sistema de Notificação (Toast) ---
+function showToast(message, type = "info") {
+  const container = document.getElementById("toast-container");
+  const toast = document.createElement("div");
+  const typeMap = {
+    success: { bg: "bg-success", icon: "fa-check-circle" },
+    error: { bg: "bg-danger", icon: "fa-exclamation-circle" },
+    warning: { bg: "bg-warning", icon: "fa-exclamation-triangle" },
+    info: { bg: "bg-info", icon: "fa-info-circle" },
+  };
+  const config = typeMap[type] || typeMap.info;
+
+  toast.className = `toast align-items-center text-white ${config.bg} border-0`;
+  toast.innerHTML = `
+    <div class="d-flex">
+      <div class="toast-body"><i class="fas ${config.icon} me-2"></i>${message}</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>`;
+  container.appendChild(toast);
+  const bsToast = new bootstrap.Toast(toast, { delay: 5000 });
+  bsToast.show();
+  toast.addEventListener("hidden.bs.toast", () => toast.remove());
+}
+
+// --- Sistema de Confirmação (Modal) ---
+function showConfirmationModal(message, onConfirm) {
+  const modalElement = document.getElementById("confirmationModal");
+  const modalBody = document.getElementById("confirmationModalBody");
+  const confirmButton = document.getElementById("confirmActionButton");
+
+  modalBody.textContent = message;
+
+  const modal = new bootstrap.Modal(modalElement);
+
+  // Função para lidar com o clique de confirmação.
+  // Usamos um handler que se remove para evitar múltiplos cliques/eventos.
+  const confirmHandler = async () => {
+    // Adiciona estado de carregamento ao botão para melhor UX
+    const originalButtonText = confirmButton.innerHTML;
+    confirmButton.disabled = true;
+    confirmButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processando...`;
+
+    try {
+      await onConfirm(); // Espera a função assíncrona (ex: deleteUser) terminar
+    } finally {
+      // Restaura o botão e esconde o modal APÓS a operação, resolvendo o aviso de acessibilidade
+      confirmButton.disabled = false;
+      confirmButton.innerHTML = originalButtonText;
+      modal.hide();
+    }
+  };
+
+  // A forma mais segura de lidar com listeners em modais reutilizáveis é remover o antigo e adicionar o novo.
+  // Clonar o nó é uma maneira eficaz de remover todos os listeners existentes.
+  const newConfirmButton = confirmButton.cloneNode(true); // Cria uma cópia limpa do botão
+  confirmButton.parentNode.replaceChild(newConfirmButton, confirmButton); // Substitui o botão antigo pelo novo
+
+  // Adiciona o listener ao novo botão. A opção { once: true } é uma ótima prática aqui.
+  newConfirmButton.addEventListener("click", confirmHandler, { once: true });
+
+  modal.show();
 }
 
 // Produtos
@@ -72,17 +154,21 @@ function openAddProduct() {
   form.removeAttribute("data-editing-image");
 
   // Restaura o título e o botão para o modo de adição
-  document.querySelector("#productModal h2").textContent =
+  document.getElementById("productModalTitle").textContent =
     "Adicionar Novo Produto";
-  document.querySelector("#prodForm button.green").textContent =
+  document.getElementById("productSubmitButton").textContent =
     "Adicionar Produto";
 
-  document.getElementById("productModal").style.display = "block";
+  const productModal = new bootstrap.Modal(
+    document.getElementById("productModal")
+  );
+  productModal.show();
   document.getElementById("pNome").focus();
 }
 function closeAddProduct() {
-  document.getElementById("productModal").style.display = "none";
-  document.getElementById("prodForm").reset(); // Limpa o formulário
+  const productModalEl = document.getElementById("productModal");
+  const productModal = bootstrap.Modal.getInstance(productModalEl);
+  if (productModal) productModal.hide();
 }
 
 async function saveProduct(e) {
@@ -92,7 +178,7 @@ async function saveProduct(e) {
   const editingId = form.getAttribute("data-editing-id");
 
   // Desabilita o botão para evitar cliques duplos
-  const submitButton = e.target.querySelector("button.green");
+  const submitButton = document.getElementById("productSubmitButton");
   const originalButtonText = submitButton.textContent;
   submitButton.disabled = true;
   submitButton.textContent = "Salvando...";
@@ -107,7 +193,10 @@ async function saveProduct(e) {
   let imageUrl = form.getAttribute("data-editing-image") || null;
 
   if (!nome || !preco || !cat_id) {
-    alert("Por favor, preencha nome, categoria e preço do produto.");
+    showToast(
+      "Por favor, preencha nome, categoria e preço do produto.",
+      "warning"
+    );
     submitButton.disabled = false;
     submitButton.textContent = originalButtonText;
     return;
@@ -128,7 +217,7 @@ async function saveProduct(e) {
 
     if (uploadError) {
       console.error("Erro no upload da imagem:", uploadError);
-      alert("Falha ao enviar a imagem.");
+      showToast("Falha ao enviar a imagem.", "error");
       submitButton.disabled = false;
       submitButton.textContent = originalButtonText;
       return;
@@ -166,7 +255,7 @@ async function saveProduct(e) {
 
   if (error) {
     console.error("Erro ao salvar produto:", error);
-    alert("Falha ao salvar o produto. Verifique o console para mais detalhes.");
+    showToast("Falha ao salvar o produto. Verifique o console.", "error");
     submitButton.disabled = false;
     submitButton.textContent = originalButtonText;
     return false;
@@ -198,50 +287,55 @@ function openEditProduct(product) {
   document.getElementById("pDescricao").value = product.description || "";
 
   // Altera o título e o botão
-  document.querySelector("#productModal h2").textContent = "Editar Produto";
-  document.querySelector("#prodForm button.green").textContent =
+  document.getElementById("productModalTitle").textContent = "Editar Produto";
+  document.getElementById("productSubmitButton").textContent =
     "Salvar Alterações";
 
   // Limpa o campo de imagem e abre o modal
   document.getElementById("pImagem").value = "";
-  document.getElementById("productModal").style.display = "block";
+  const productModal = new bootstrap.Modal(
+    document.getElementById("productModal")
+  );
+  productModal.show();
 }
 
-async function deleteProduct(id, imageUrl) {
-  if (!confirm("Tem certeza que deseja excluir este produto?")) {
-    return;
-  }
+async function deleteProduct(id, imageUrl, productName) {
+  const confirmationMessage = `Tem certeza que deseja excluir o produto "${escapeHtml(
+    productName
+  )}"? Esta ação não pode ser desfeita.`;
 
-  // Excluir do banco de dados
-  const { error: dbError } = await supabase
-    .from("products")
-    .delete()
-    .eq("id", id);
+  showConfirmationModal(confirmationMessage, async () => {
+    // Excluir do banco de dados
+    const { error: dbError } = await supabase
+      .from("products")
+      .delete()
+      .eq("id", id);
 
-  if (dbError) {
-    console.error("Erro ao excluir produto:", dbError);
-    alert("Não foi possível excluir o produto.");
-    return;
-  }
-
-  // Excluir imagem do storage, se houver
-  if (imageUrl) {
-    const imageName = imageUrl.split("/").pop();
-    const { error: storageError } = await supabase.storage
-      .from("product_images")
-      .remove([imageName]);
-
-    if (storageError) {
-      console.error("Erro ao excluir imagem do storage:", storageError);
-      // Avisa o usuário mas continua, pois o produto já foi deletado
-      alert(
-        "Produto excluído, mas houve um erro ao remover a imagem do armazenamento."
-      );
+    if (dbError) {
+      console.error("Erro ao excluir produto:", dbError);
+      showToast("Não foi possível excluir o produto.", "error");
+      return;
     }
-  }
 
-  alert("Produto excluído com sucesso!");
-  fetchAndRenderProducts();
+    // Excluir imagem do storage, se houver
+    if (imageUrl) {
+      const imageName = imageUrl.split("/").pop();
+      const { error: storageError } = await supabase.storage
+        .from("product_images")
+        .remove([imageName]);
+
+      if (storageError) {
+        console.error("Erro ao excluir imagem do storage:", storageError);
+        showToast(
+          "Produto excluído, mas houve um erro ao remover a imagem.",
+          "warning"
+        );
+      }
+    }
+
+    showToast("Produto excluído com sucesso!", "success");
+    fetchAndRenderProducts();
+  });
 }
 
 // --- SEÇÃO DE USUÁRIOS ---
@@ -251,7 +345,8 @@ function openAddUserModal() {
   form.reset();
   form.removeAttribute("data-editing-id");
 
-  document.querySelector("#userModal h2").textContent =
+  // Corrige o seletor para o título do modal
+  document.getElementById("userModalLabel").textContent =
     "Adicionar Novo Usuário";
   document.getElementById("userSubmitButton").textContent = "Adicionar Usuário";
 
@@ -260,13 +355,15 @@ function openAddUserModal() {
   document.getElementById("uSenha").required = true;
   document.getElementById("uSenha").placeholder = "Mínimo 6 caracteres";
 
-  document.getElementById("userModal").style.display = "block";
+  const userModal = new bootstrap.Modal(document.getElementById("userModal"));
+  userModal.show();
   document.getElementById("uNome").focus();
 }
 
 function closeUserModal() {
-  document.getElementById("userModal").style.display = "none";
-  document.getElementById("userForm").reset();
+  const userModalEl = document.getElementById("userModal");
+  const userModal = bootstrap.Modal.getInstance(userModalEl);
+  if (userModal) userModal.hide();
 }
 
 function openEditUserModal(user) {
@@ -287,10 +384,12 @@ function openEditUserModal(user) {
   // Desabilita a edição do email (chave primária de autenticação)
   document.getElementById("uEmail").disabled = true;
 
-  document.querySelector("#userModal h2").textContent = "Editar Usuário";
+  // Corrige o seletor para o título do modal
+  document.getElementById("userModalLabel").textContent = "Editar Usuário";
   document.getElementById("userSubmitButton").textContent = "Salvar Alterações";
 
-  document.getElementById("userModal").style.display = "block";
+  const userModal = new bootstrap.Modal(document.getElementById("userModal"));
+  userModal.show();
 }
 
 async function saveUser(e) {
@@ -310,49 +409,169 @@ async function saveUser(e) {
   const status = document.getElementById("uStatus").value;
 
   try {
+    console.log(
+      "[saveUser] Iniciando salvamento. Modo:",
+      editingId ? "Edição" : "Criação"
+    );
+
+    // Força a atualização da sessão para garantir que o token de acesso esteja válido.
+    // Isso ajuda a evitar erros de "sessão inválida" se o token tiver expirado.
+    console.log("[saveUser] 1. Tentando atualizar a sessão...");
+    const { data: refreshData, error: refreshError } =
+      await supabase.auth.refreshSession();
+    if (refreshError) {
+      console.error("[saveUser] ERRO ao atualizar a sessão:", refreshError);
+      throw new Error(
+        "Não foi possível validar a sessão. Faça login novamente."
+      );
+    }
+    console.log("[saveUser] 2. Sessão atualizada com sucesso.");
+
+    const session = refreshData.session;
+    console.log(
+      "[saveUser] 3. Obtendo sessão atual. A sessão é:",
+      session ? "Válida" : "Nula",
+      session // Loga o objeto da sessão inteiro para inspeção
+    );
+
+    // Adiciona uma verificação explícita para garantir que a sessão e o token existam.
+    // O 'optional chaining' (?.) previne erros se a sessão for nula.
+    if (!session?.access_token) {
+      console.error(
+        "[saveUser] ERRO: O 'access_token' não foi encontrado na sessão."
+      );
+      throw new Error("Sessão inválida. Faça login novamente.");
+    }
+
+    console.log(
+      "[saveUser] 4. Token de acesso encontrado. Preparando requisição..."
+    );
+
+    const backendUrl =
+      localStorage.getItem("backendUrl") || "http://localhost:3000";
+    let url = `${backendUrl}/admin/users`;
+    let method = "POST";
+
+    const body = {
+      full_name: fullName,
+      email: email,
+      role: role,
+      status: status,
+    };
+
     if (editingId) {
       // --- MODO EDIÇÃO ---
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .update({ full_name: fullName, role: role, status: status })
-        .eq("id", editingId);
-
-      if (profileError) throw profileError;
-
+      url = `${backendUrl}/admin/users/${editingId}`;
+      method = "PUT";
+      // No modo de edição, não enviamos o email e só enviamos a senha se ela for preenchida
+      delete body.email;
       if (password) {
-        alert(
-          "Perfil atualizado. A alteração de senha de outros usuários requer uma configuração de backend segura e não é suportada diretamente no cliente."
-        );
+        body.password = password;
       }
     } else {
       // --- MODO CRIAÇÃO ---
       if (password.length < 6) {
         throw new Error("A senha deve ter no mínimo 6 caracteres.");
       }
-      // Usamos signUp, que enviará um email de confirmação para o novo usuário.
-      const { data, error: authError } = await supabase.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-          data: {
-            full_name: fullName,
-            role: role, // Passa o role para o trigger handle_new_user
-          },
-        },
-      });
-      if (authError) throw authError;
+      body.password = password;
     }
+
+    console.log(
+      `[saveUser] 5. Enviando requisição ${method} para ${url} com o corpo:`,
+      body
+    );
+
+    const response = await fetch(url, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`, // Correção: access_token
+      },
+      body: JSON.stringify(body),
+    });
+
+    console.log(
+      "[saveUser] 6. Resposta do servidor recebida. Status:",
+      response.status
+    );
+    const result = await response.json();
+
+    if (!response.ok) {
+      console.error(
+        "[saveUser] ERRO: A resposta do servidor não foi OK.",
+        result
+      );
+      throw new Error(
+        result.details || result.error || "Erro desconhecido do servidor."
+      );
+    }
+    console.log("[saveUser] 7. Operação bem-sucedida. Resposta:", result);
+    showToast(result.message || "Operação realizada com sucesso!", "success");
 
     closeUserModal();
     fetchAndRenderUsers(); // Atualiza a lista de usuários
   } catch (error) {
     console.error("Erro ao salvar usuário:", error);
-    alert(`Falha ao salvar usuário: ${error.message}`);
+    showToast(`Falha ao salvar usuário: ${error.message}`, "error");
   } finally {
     submitButton.disabled = false;
     submitButton.textContent = originalButtonText;
   }
   return false;
+}
+
+async function deleteUser(userId, userName) {
+  const confirmationMessage = `Tem certeza que deseja EXCLUIR PERMANENTEMENTE o usuário "${userName}"? Esta ação não pode ser desfeita.`;
+
+  showConfirmationModal(confirmationMessage, async () => {
+    // A função passada para onConfirm já é async
+    // O código abaixo só será executado se o usuário clicar em "Confirmar" no modal.
+
+    // Verifica se o usuário logado está tentando se auto-excluir
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (session && session.user.id === userId) {
+      showToast("Você não pode excluir sua própria conta.", "warning");
+      return;
+    }
+
+    // Corrigido: a propriedade é 'access_token' e a verificação já existe no refreshSession
+    if (!session?.access_token) {
+      showToast("Sessão inválida ou expirada. Faça login novamente.", "error");
+      return;
+    }
+
+    // Chama o endpoint seguro no backend
+    try {
+      const backendUrl =
+        localStorage.getItem("backendUrl") || "http://localhost:3000";
+      const response = await fetch(`${backendUrl}/admin/users/${userId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`, // Correção: access_token
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.details || result.error || "Erro desconhecido do servidor."
+        );
+      }
+
+      showToast(result.message || "Usuário excluído com sucesso!", "success");
+      fetchAndRenderUsers(); // Atualiza a lista de usuários na tela
+    } catch (error) {
+      console.error("Erro ao excluir usuário:", error);
+      showToast(
+        `Não foi possível excluir o usuário: ${error.message}`,
+        "error"
+      );
+    }
+  });
 }
 
 // Financeiro
@@ -395,6 +614,23 @@ function refreshUI() {
   if (financeiroNav) {
     financeiroNav.style.display =
       state.currentUser.role === "admin" ? "flex" : "none";
+  }
+
+  // REGRA DE ACESSO: Esconde o menu 'Usuários' se o usuário for 'seller'
+  const usuariosNav = document.querySelector('.nav-item[data-page="usuarios"]');
+  if (usuariosNav) {
+    usuariosNav.style.display = ["admin", "manager"].includes(
+      state.currentUser.role
+    )
+      ? "flex"
+      : "none";
+  }
+
+  // Atualiza o avatar do usuário no cabeçalho
+  const userAvatar = document.getElementById("user-avatar");
+  if (userAvatar) {
+    // Usa a URL do avatar do estado, ou uma imagem padrão se não houver
+    userAvatar.src = state.currentUser.avatar_url || "https://i.pravatar.cc/40";
   }
 
   // summary cards
@@ -453,12 +689,14 @@ function refreshUI() {
         <td>${prod.stock}</td>
         <td>${status}</td>
         <td>
-            <button class="btn grey" onclick='openEditProduct(${JSON.stringify(
+            <button class="btn btn-sm btn-secondary" onclick='openEditProduct(${JSON.stringify(
               prod
             )})'>Editar</button>
-            <button class="btn red" onclick="deleteProduct(${prod.id}, '${
-      prod.image_url
-    }')">Excluir</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteProduct(${
+              prod.id
+            }, '${prod.image_url}', '${escapeHtml(
+      prod.name
+    )}')">Excluir</button>
         </td>
       `;
     prodBody.appendChild(tr);
@@ -466,41 +704,6 @@ function refreshUI() {
     const tr2 = tr.cloneNode(true);
     stockBody.appendChild(tr2);
   });
-
-  // Tabela de usuários
-  const userBody = document.getElementById("userBody");
-  const userEmpty = document.getElementById("userEmpty");
-  userBody.innerHTML = "";
-  if (state.users.length === 0) {
-    userEmpty.style.display = "flex";
-    document.getElementById("userTable").style.display = "none";
-  } else {
-    userEmpty.style.display = "none";
-    document.getElementById("userTable").style.display = "table";
-  }
-
-  state.users.forEach((user) => {
-    const tr = document.createElement("tr");
-    const statusClass =
-      user.status === "active" ? "status-active" : "status-inactive";
-    tr.innerHTML = `
-            <td>${escapeHtml(user.full_name || "N/A")}</td>
-            <td>${escapeHtml(user.email)}</td>
-            <td>${escapeHtml(user.role)}</td>
-            <td><span class="status ${statusClass}">${
-      user.status || "N/A"
-    }</span></td>
-            <td>
-                <button class="btn grey" onclick='openEditUserModal(${JSON.stringify(
-                  user
-                )})'>Editar</button>
-                <button class="btn red" disabled title="Função desabilitada por segurança">Excluir</button>
-            </td>
-        `;
-    userBody.appendChild(tr);
-  });
-
-  // ... (restante da função refreshUI)
 
   // Financeiro
   const finBody = document.getElementById("finBody");
@@ -545,9 +748,7 @@ async function fetchAndRenderProducts() {
 
   if (error) {
     console.error("Erro ao buscar produtos:", error);
-    alert(
-      "Não foi possível carregar os produtos. Verifique o console para mais detalhes."
-    );
+    showToast("Não foi possível carregar os produtos.", "error");
     return;
   }
 
@@ -556,18 +757,96 @@ async function fetchAndRenderProducts() {
 }
 
 async function fetchAndRenderUsers() {
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error("Erro ao buscar usuários:", error);
-    alert("Não foi possível carregar os usuários.");
+  // Adiciona uma verificação de permissão no frontend.
+  // Só tenta buscar os usuários se o usuário logado for um administrador.
+  if (state.currentUser.role !== "admin") {
+    console.log("[fetchAndRenderUsers] Acesso pulado. Usuário não é admin.");
     return;
   }
-  state.users = data;
-  refreshUI();
+
+  // Melhoria: Utiliza o endpoint seguro do backend para buscar usuários.
+  try {
+    await supabase.auth.refreshSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.access_token) {
+      throw new Error("Sessão inválida para buscar usuários.");
+    }
+
+    const backendUrl =
+      localStorage.getItem("backendUrl") || "http://localhost:3000";
+    const response = await fetch(`${backendUrl}/admin/users`, {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`, // Correção: access_token
+      },
+    });
+
+    if (!response.ok)
+      throw new Error(`Erro do servidor: ${response.statusText}`);
+
+    const data = await response.json();
+    state.users = data.users || [];
+    renderUsersList();
+  } catch (error) {
+    console.error("Erro ao buscar usuários via backend:", error);
+    showToast(
+      `Não foi possível carregar os usuários: ${error.message}`,
+      "error"
+    );
+  }
+}
+
+function renderUsersList() {
+  const userBody = document.getElementById("userBody");
+  const userEmpty = document.getElementById("userEmpty");
+  const userRoleFilterEl = document.getElementById("userRoleFilter");
+  if (!userBody || !userEmpty || !userRoleFilterEl) return;
+
+  const userRoleFilter = userRoleFilterEl.value;
+  userBody.innerHTML = "";
+
+  // Filtra os usuários com base no cargo selecionado
+  const filteredUsers = state.users.filter((user) => {
+    if (userRoleFilter === "all") {
+      return true; // Mostra todos se 'all' estiver selecionado
+    }
+    return user.role === userRoleFilter;
+  });
+
+  if (filteredUsers.length === 0) {
+    userEmpty.style.display = "block"; // Usa 'block' para o novo layout
+    document.getElementById("userTable").style.display = "none";
+  } else {
+    userEmpty.style.display = "none";
+    document.getElementById("userTable").style.display = "table";
+  }
+
+  filteredUsers.forEach((user) => {
+    const tr = document.createElement("tr");
+    const statusClass =
+      user.status === "active" ? "status-active" : "status-inactive";
+    tr.innerHTML = `
+            <td>${escapeHtml(user.full_name || "N/A")}</td>
+            <td>${escapeHtml(user.email)}</td>
+            <td>${escapeHtml(user.role)}</td>
+            <td><span class="status ${statusClass}">${
+      user.status || "N/A"
+    }</span></td>
+            <td class="text-end">
+                <button class="btn btn-sm btn-secondary" onclick='openEditUserModal(${JSON.stringify(
+                  user
+                )})'>Editar</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteUser('${
+                  user.id
+                }', '${escapeHtml(user.full_name || user.email)}')">
+                  Excluir
+                </button>
+            </td>
+        `;
+    userBody.appendChild(tr);
+  });
 }
 
 async function renderCategoriesTable() {
@@ -596,10 +875,10 @@ async function renderCategoriesTable() {
       tr.innerHTML = `
                 <td>${escapeHtml(cat.name)}</td>
                 <td>
-                    <button class="btn grey" onclick="editCategory(${
+                    <button class="btn btn-sm btn-secondary" onclick="editCategory(${
                       cat.id
                     }, '${escapeHtml(cat.name)}')">Editar</button>
-                    <button class="btn red" onclick="deleteCategory(${
+                    <button class="btn btn-sm btn-danger" onclick="deleteCategory(${
                       cat.id
                     })">Excluir</button>
                 </td>
@@ -643,13 +922,14 @@ async function addNewCategory() {
 
   if (error) {
     console.error("Erro ao adicionar categoria:", error);
-    alert(
-      "Não foi possível adicionar a nova categoria. Verifique se ela já existe."
+    showToast(
+      "Não foi possível adicionar a categoria. Verifique se ela já existe.",
+      "error"
     );
     return;
   }
 
-  alert("Categoria adicionada com sucesso!");
+  showToast("Categoria adicionada com sucesso!", "success");
   fetchAndPopulateCategories(); // Atualiza o dropdown
   renderCategoriesTable(); // Atualiza a tabela de categorias
 }
@@ -667,11 +947,11 @@ async function editCategory(id, currentName) {
 
   if (error) {
     console.error("Erro ao editar categoria:", error);
-    alert("Não foi possível editar a categoria.");
+    showToast("Não foi possível editar a categoria.", "error");
     return;
   }
 
-  alert("Categoria atualizada com sucesso!");
+  showToast("Categoria atualizada com sucesso!", "success");
   fetchAndPopulateCategories();
   renderCategoriesTable();
 }
@@ -689,13 +969,14 @@ async function deleteCategory(id) {
 
   if (error) {
     console.error("Erro ao excluir categoria:", error);
-    alert(
-      "Não foi possível excluir a categoria. Verifique se ela não está sendo usada por nenhum produto."
+    showToast(
+      "Não foi possível excluir a categoria. Verifique se ela não está sendo usada por nenhum produto.",
+      "error"
     );
     return;
   }
 
-  alert("Categoria excluída com sucesso!");
+  showToast("Categoria excluída com sucesso!", "success");
   fetchAndPopulateCategories();
   renderCategoriesTable();
 }
@@ -713,7 +994,7 @@ async function fetchAndRenderOrders() {
 
   if (error) {
     console.error("Erro ao buscar pedidos:", error);
-    alert("Não foi possível carregar os pedidos.");
+    showToast("Não foi possível carregar os pedidos.", "error");
     state.orders = [];
   } else {
     state.orders = data || [];
@@ -751,7 +1032,7 @@ function statusBadge(status) {
   };
   const info = statusMap[status] || { text: status, class: "badge-default" };
   return `<span class="badge-order ${info.class}">${escapeHtml(
-    info.text
+    String(info.text || status || "")
   )}</span>`;
 }
 
@@ -791,14 +1072,14 @@ function renderOrdersList() {
     container.innerHTML = `<div class="orders-grid">${filteredOrders
       .map(
         (order) => `
-            <div class="order-card" onclick="showOrderDetails(${order.id})">
+            <div class="order-card" data-order-id="${order.id}">
                 <div class="order-card-header">
                     <strong>Pedido #${order.id}</strong>
                     ${statusBadge(order.status)}
                 </div>
                 <div class="order-card-body">
                     <p><strong>Cliente:</strong> ${escapeHtml(
-                      order.customer_info?.name || "N/A"
+                      (order.customer_info && order.customer_info.name) || "N/A"
                     )}</p>
                     <p><strong>Total:</strong> ${formatMoney(
                       order.total_amount
@@ -808,7 +1089,7 @@ function renderOrdersList() {
                     ).toLocaleDateString()}</p>
                 </div>
                 <div class="order-card-footer">
-                    <button class="btn grey" onclick="event.stopPropagation(); openOrderStatusModal(${
+                    <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); openOrderStatusModal(${
                       order.id
                     })">Alterar Status</button>
                 </div>
@@ -819,7 +1100,7 @@ function renderOrdersList() {
   } else {
     // Table view
     container.innerHTML = `
-            <table class="table">
+            <table class="table table-hover align-middle">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -834,10 +1115,12 @@ function renderOrdersList() {
                     ${filteredOrders
                       .map(
                         (order) => `
-                        <tr onclick="showOrderDetails(${order.id})">
+                        <tr data-order-id="${order.id}">
                             <td>#${order.id}</td>
                             <td>${escapeHtml(
-                              order.customer_info?.name || "N/A"
+                              (order.customer_info &&
+                                order.customer_info.name) ||
+                                "N/A"
                             )}</td>
                             <td>${new Date(
                               order.created_at
@@ -845,7 +1128,7 @@ function renderOrdersList() {
                             <td>${formatMoney(order.total_amount)}</td>
                             <td>${statusBadge(order.status)}</td>
                             <td>
-                                <button class="btn grey" onclick="event.stopPropagation(); openOrderStatusModal(${
+                                <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); openOrderStatusModal(${
                                   order.id
                                 })">Alterar</button>
                             </td>
@@ -868,11 +1151,16 @@ function openOrderStatusModal(orderId) {
   statusSelect.value = order.status;
   statusSelect.setAttribute("data-order-id", orderId);
 
-  document.getElementById("orderStatusModal").style.display = "block";
+  const orderStatusModal = new bootstrap.Modal(
+    document.getElementById("orderStatusModal")
+  );
+  orderStatusModal.show();
 }
 
 function closeOrderStatusModal() {
-  document.getElementById("orderStatusModal").style.display = "none";
+  const orderStatusModalEl = document.getElementById("orderStatusModal");
+  const orderStatusModal = bootstrap.Modal.getInstance(orderStatusModalEl);
+  if (orderStatusModal) orderStatusModal.hide();
 }
 
 async function confirmOrderStatusChange() {
@@ -887,7 +1175,7 @@ async function confirmOrderStatusChange() {
 
   if (error) {
     console.error("Erro ao atualizar status:", error);
-    alert("Falha ao atualizar o status do pedido.");
+    showToast("Falha ao atualizar o status do pedido.", "error");
   } else {
     // Atualiza o estado local e renderiza novamente
     const orderInState = state.orders.find((o) => o.id == orderId);
@@ -895,13 +1183,21 @@ async function confirmOrderStatusChange() {
       orderInState.status = newStatus;
     }
     renderOrdersList();
-    alert("Status do pedido atualizado com sucesso!");
+    showToast("Status do pedido atualizado com sucesso!", "success");
   }
 
   closeOrderStatusModal();
 }
 
-function showOrderDetails(orderId) {
+function showOrderDetails(event) {
+  // Encontra o elemento clicável mais próximo (card ou linha da tabela)
+  const target = event.target.closest("[data-order-id]");
+  if (!target) return;
+
+  // Pega o ID do pedido a partir do data-attribute
+  const orderId = parseInt(target.dataset.orderId, 10);
+  if (!orderId) return;
+
   const order = state.orders.find((o) => o.id === orderId);
   if (!order) return;
 
@@ -911,9 +1207,9 @@ function showOrderDetails(orderId) {
   const itemsHtml = (order.items_info || [])
     .map(
       (item) => `
-        <li>${escapeHtml(item.title)} (x${item.quantity}) - ${formatMoney(
-        item.unit_price
-      )}</li>
+        <li>${escapeHtml(item.title || "Item sem nome")} (x${
+        item.quantity
+      }) - ${formatMoney(item.unit_price)}</li>
     `
     )
     .join("");
@@ -925,10 +1221,14 @@ function showOrderDetails(orderId) {
         ).toLocaleString()}</p>
         <hr>
         <h4>Informações do Cliente</h4>
-        <p><strong>Nome:</strong> ${escapeHtml(order.customer_info?.name)}</p>
-        <p><strong>Email:</strong> ${escapeHtml(order.customer_info?.email)}</p>
+        <p><strong>Nome:</strong> ${escapeHtml(
+          (order.customer_info && order.customer_info.name) || "N/A"
+        )}</p>
+        <p><strong>Email:</strong> ${escapeHtml(
+          (order.customer_info && order.customer_info.email) || "N/A"
+        )}</p>
         <p><strong>Telefone:</strong> ${escapeHtml(
-          order.customer_info?.phone?.number
+          (order.customer_info?.phone?.number || "N/A").toString()
         )}</p>
         <hr>
         <h4>Itens do Pedido</h4>
@@ -937,11 +1237,16 @@ function showOrderDetails(orderId) {
         <h4>Total do Pedido: ${formatMoney(order.total_amount)}</h4>
     `;
 
-  document.getElementById("orderDetailModal").style.display = "block";
+  const orderDetailModal = new bootstrap.Modal(
+    document.getElementById("orderDetailModal")
+  );
+  orderDetailModal.show();
 }
 
 function closeOrderDetails() {
-  document.getElementById("orderDetailModal").style.display = "none";
+  const orderDetailModalEl = document.getElementById("orderDetailModal");
+  const orderDetailModal = bootstrap.Modal.getInstance(orderDetailModalEl);
+  if (orderDetailModal) orderDetailModal.hide();
 }
 
 async function fetchCurrentUserRole() {
@@ -957,7 +1262,7 @@ async function fetchCurrentUserRole() {
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, avatar_url")
     .eq("id", session.user.id)
     .single();
 
@@ -969,6 +1274,7 @@ async function fetchCurrentUserRole() {
   }
 
   state.currentUser.role = profile.role;
+  state.currentUser.avatar_url = profile.avatar_url;
 }
 
 async function init() {
@@ -978,12 +1284,17 @@ async function init() {
   showPage("panel");
   fetchAndRenderProducts(); // Busca e renderiza os produtos do Supabase
   fetchAndPopulateCategories(); // Busca e preenche as categorias no modal
-  fetchAndRenderUsers(); // Busca e renderiza os usuários
+  await fetchAndRenderUsers(); // Busca e renderiza os usuários (agora com await)
   renderCategoriesTable(); // Busca e renderiza a tabela de categorias
   fetchAndRenderOrders(); // Busca e renderiza os pedidos
   document
     .getElementById("btnNovaCategoria")
     .addEventListener("click", addNewCategory);
+
+  // Adiciona o event listener centralizado para os detalhes do pedido
+  const ordersListContainer = document.getElementById("ordersList");
+  if (ordersListContainer)
+    ordersListContainer.addEventListener("click", showOrderDetails);
 }
 
 // Helpers

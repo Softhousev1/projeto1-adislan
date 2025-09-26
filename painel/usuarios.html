@@ -1,19 +1,22 @@
 <!doctype html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Gerenciar Usuários - Painel Admin</title>
-<link rel="stylesheet" href="admin.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gerenciar Usuários - Painel Admin</title>
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
+
 <body>
   <script>
     const supabaseUrl = 'https://hylttfhaedvytykjpeze.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5bHR0ZmhhZWR2eXR5a2pwZXplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTE1MDgsImV4cCI6MjA3NDI4NzUwOH0.e0BmMYbBC9QBI6TNsKgWUckFqCPnjPGEAq6-7h1W18A'; 
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5bHR0ZmhhZWR2eXR5a2pwZXplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTE1MDgsImV4cCI6MjA3NDI4NzUwOH0.e0BmMYbBC9QBI6TNsKgWUckFqCPnjPGEAq6-7h1W18A';
     const supa = supabase.createClient(supabaseUrl, supabaseKey);
     window.supabase = window.supabase || supa;
 
+    let currentUserRole = null; // Variável para guardar a role do usuário logado
     const guardAdmin = async () => {
       const { data: { session } } = await supa.auth.getSession();
       if (!session) { window.location.href = '../login.html'; return; }
@@ -22,6 +25,7 @@
         .select('role')
         .eq('id', session.user.id)
         .single();
+      currentUserRole = profile?.role; // Armazena a role
       if (!profile || profile.role !== 'admin') {
         await supa.auth.signOut();
         alert('Acesso negado.');
@@ -59,7 +63,9 @@
       <section class="page active">
         <div class="panel">
           <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-            <div style="width:60%"><p style="margin:0;color:var(--muted)">Liste, busque, pagine, altere papéis e remova usuários.</p></div>
+            <div style="width:60%">
+              <p style="margin:0;color:var(--muted)">Liste, busque, pagine, altere papéis e remova usuários.</p>
+            </div>
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
               <button class="btn green" id="btnOpenAddUser">+ Adicionar Usuário</button>
               <input id="searchInput" type="text" placeholder="Buscar por nome ou email" style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px;min-width:220px">
@@ -190,9 +196,9 @@
     let currentPage = 1;
     let pageSize = parseInt(pageSizeEl ? pageSizeEl.value : '10', 10);
 
-    function renderUsers(rows){
+    function renderUsers(rows) {
       usersBody.innerHTML = '';
-      if (!rows || rows.length === 0){
+      if (!rows || rows.length === 0) {
         usersEmpty.style.display = 'flex';
         resultsInfo.textContent = '0 resultados';
         pageIndicator.textContent = '';
@@ -200,22 +206,34 @@
       }
       usersEmpty.style.display = 'none';
       rows.forEach(u => {
-        const tr = document.createElement('tr');
         const displayName = u.full_name || u.name || '-';
         const email = u.email || '-';
         const role = u.role || 'user';
         const status = u.status || 'active'; // 'active' ou 'inactive'
-        const safeName = (displayName || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        const safeEmail = (email || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         const isCurrentUser = supa.auth.user() && supa.auth.user().id === u.id;
+        const canDelete = currentUserRole === 'admin' && !isCurrentUser;
 
+        const tr = document.createElement('tr');
+
+        // Célula Nome
+        const tdName = document.createElement('td');
+        tdName.textContent = displayName;
+        tr.appendChild(tdName);
+
+        // Célula Email
+        const tdEmail = document.createElement('td');
+        tdEmail.textContent = email;
+        tr.appendChild(tdEmail);
+
+        // Célula Papel (Role)
+        const tdRole = document.createElement('td');
         tr.innerHTML = `
-          <td>${safeName}</td>
-          <td>${safeEmail}</td>
+          <td>${tdName.outerHTML}</td>
+          <td>${tdEmail.outerHTML}</td>
           <td>
             <select data-user-id="${u.id}" class="role-select" ${isCurrentUser ? 'disabled' : ''}>
-              <option value="user" ${role==='user'?'selected':''}>Usuário</option>
-              <option value="admin" ${role==='admin'?'selected':''}>Admin</option>
+              <option value="user" ${role === 'user' ? 'selected' : ''}>Usuário</option>
+              <option value="admin" ${role === 'admin' ? 'selected' : ''}>Admin</option>
             </select>
           </td>
           <td><span class="status-${status}">${status === 'active' ? 'Ativo' : 'Inativo'}</span></td>
@@ -224,15 +242,19 @@
             <button class="btn ${status === 'active' ? 'red' : 'green'}" onclick="toggleUserStatus('${u.id}', '${status}')" ${isCurrentUser ? 'disabled' : ''}>
               ${status === 'active' ? 'Desativar' : 'Ativar'}
             </button>
+            <button class="btn red" onclick="deleteUser('${u.id}')" ${!canDelete ? 'disabled' : ''} title="${!canDelete ? 'Apenas administradores podem excluir outros usuários.' : 'Excluir usuário permanentemente'}">
+              Excluir
+            </button>
           </td>
         `;
+
         usersBody.appendChild(tr);
       });
     }
 
-    function applyFilter(){
+    function applyFilter() {
       const term = (searchInput ? searchInput.value : '').trim().toLowerCase();
-      if (!term){
+      if (!term) {
         filteredUsers = [...allUsers];
       } else {
         filteredUsers = allUsers.filter(u => {
@@ -245,7 +267,7 @@
       renderPage();
     }
 
-    function renderPage(){
+    function renderPage() {
       const total = filteredUsers.length;
       const totalPages = Math.max(1, Math.ceil(total / pageSize));
       currentPage = Math.min(Math.max(1, currentPage), totalPages);
@@ -254,12 +276,12 @@
       const rows = filteredUsers.slice(start, end);
       renderUsers(rows);
       pageIndicator.textContent = `Página ${currentPage} de ${totalPages}`;
-      resultsInfo.textContent = `${total} resultado${total===1?'':'s'}`;
+      resultsInfo.textContent = `${total} resultado${total === 1 ? '' : 's'}`;
       btnPrev.disabled = currentPage <= 1;
       btnNext.disabled = currentPage >= totalPages;
     }
 
-    async function loadUsers(){
+    async function loadUsers() {
       try {
         // Primeira tentativa: direto do Supabase (cliente anon)
         const { data, error } = await supa
@@ -272,25 +294,32 @@
           return;
         }
         console.warn('Falha no carregamento direto do Supabase, tentando backend...', error);
-      } catch (e){
+      } catch (e) {
         console.warn('Exceção ao consultar Supabase direto, tentando backend...', e);
       }
 
       try {
-        const res = await fetch(`${backendUrl}/admin/users`, { method: 'GET' });
+        const { data: { session } } = await supa.auth.getSession();
+        const res = await fetch(`${backendUrl}/admin/users`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session?.accessToken}`
+          }
+        });
         if (!res.ok) {
           throw new Error(`HTTP ${res.status}`);
         }
         const json = await res.json();
         allUsers = json.users || [];
         applyFilter();
-      } catch (e){
+      } catch (e) {
         console.error('Erro ao carregar usuários via backend:', e);
         alert('Não foi possível carregar usuários.');
       }
     }
 
-    async function saveRole(userId){
+    async function saveRole(userId) {
       const select = document.querySelector(`select.role-select[data-user-id="${userId}"]`);
       if (!select) return;
       const newRole = select.value;
@@ -298,7 +327,7 @@
         .from('profiles')
         .update({ role: newRole })
         .eq('id', userId);
-      if (error){
+      if (error) {
         console.error('Erro ao salvar papel:', error);
         alert('Não foi possível atualizar o papel.');
         return;
@@ -329,21 +358,55 @@
       loadUsers();
     }
 
-    // A função deleteUser foi substituída por toggleUserStatus, que é mais segura.
-    // A exclusão real (deleteUser) exigiria uma função de servidor (Edge Function) para chamar a API de Admin do Supabase.
-    // async function deleteUser(userId) { ... }
+    async function deleteUser(userId) {
+      if (!confirm('Tem certeza que deseja EXCLUIR PERMANENTEMENTE este usuário? Esta ação não pode ser desfeita.')) return;
+
+      // Agora, em vez de chamar uma Supabase Function, chamamos nosso endpoint de backend.
+      try {
+        // 1. Obter a sessão atual para pegar o token de acesso
+        const { data: { session } } = await supa.auth.getSession();
+        if (!session) {
+          alert('Sua sessão expirou. Por favor, faça login novamente.');
+          window.location.href = '../login.html';
+          return;
+        }
+
+        // 2. Fazer a requisição para o backend, incluindo o token no cabeçalho
+        const response = await fetch(`${backendUrl}/admin/users/${userId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            // Envia o token JWT para o backend para autenticação
+            'Authorization': `Bearer ${session.accessToken}`
+          }
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.details || result.error || 'Erro desconhecido do servidor.');
+        }
+
+        alert(result.message || 'Usuário excluído com sucesso!');
+        loadUsers();
+
+      } catch (error) {
+        console.error('Erro ao excluir usuário:', error);
+        alert(`Não foi possível excluir o usuário: ${error.message}. Verifique se o servidor backend está rodando.`);
+      }
+    }
 
     // --- Adicionar Usuário (Modal) ---
-    function openAddUserModal(){
-      if (addUserModal){ addUserModal.style.display = 'block'; }
-      if (auName){ auName.focus(); }
+    function openAddUserModal() {
+      if (addUserModal) { addUserModal.style.display = 'block'; }
+      if (auName) { auName.focus(); }
     }
-    function closeAddUserModal(){
-      if (addUserModal){ addUserModal.style.display = 'none'; }
-      if (addUserForm){ addUserForm.reset(); }
+    function closeAddUserModal() {
+      if (addUserModal) { addUserModal.style.display = 'none'; }
+      if (addUserForm) { addUserForm.reset(); }
     }
 
-    async function handleAddUserSubmit(e){
+    async function handleAddUserSubmit(e) {
       e.preventDefault();
       const name = (auName?.value || '').trim();
       const email = (auEmail?.value || '').trim();
@@ -351,7 +414,7 @@
       const role = auRole?.value || 'user';
       const status = auStatus?.value || 'active';
 
-      if (!name || !email || !password){
+      if (!name || !email || !password) {
         alert('Preencha nome, email e senha.');
         return;
       }
@@ -359,13 +422,18 @@
       btnSubmitAddUser.disabled = true;
       btnSubmitAddUser.textContent = 'Salvando...';
       try {
+        const { data: { session } } = await supa.auth.getSession();
         const res = await fetch(`${backendUrl}/admin/users`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            // Adiciona o token de autorização para a rota protegida
+            'Authorization': `Bearer ${session?.accessToken}`
+          },
           body: JSON.stringify({ full_name: name, email, password, role, status })
         });
-        const data = await res.json().catch(()=>({}));
-        if (!res.ok){
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
           console.error('Erro ao criar usuário:', data);
           alert(data?.error || 'Não foi possível criar o usuário.');
           return;
@@ -373,7 +441,7 @@
         alert('Usuário criado com sucesso!');
         closeAddUserModal();
         loadUsers();
-      } catch(err){
+      } catch (err) {
         console.error(err);
         alert('Falha de rede ao criar usuário.');
       } finally {
@@ -385,11 +453,11 @@
     if (btnOpenAddUser) btnOpenAddUser.addEventListener('click', openAddUserModal);
     if (btnCancelAddUser) btnCancelAddUser.addEventListener('click', closeAddUserModal);
     if (closeAddUser) closeAddUser.addEventListener('click', closeAddUserModal);
-    if (addUserModal) addUserModal.addEventListener('click', (e)=>{ if (e.target === addUserModal) closeAddUserModal(); });
+    if (addUserModal) addUserModal.addEventListener('click', (e) => { if (e.target === addUserModal) closeAddUserModal(); });
     if (addUserForm) addUserForm.addEventListener('submit', handleAddUserSubmit);
 
 
-    document.getElementById('btnLogout').onclick = async function(){
+    document.getElementById('btnLogout').onclick = async function () {
       const { error } = await supa.auth.signOut();
       if (error) {
         console.error('Erro ao fazer logout:', error);
@@ -398,13 +466,14 @@
     };
 
     if (btnSearch) btnSearch.addEventListener('click', applyFilter);
-    if (btnClear) btnClear.addEventListener('click', () => { if (searchInput){ searchInput.value=''; } applyFilter(); });
+    if (btnClear) btnClear.addEventListener('click', () => { if (searchInput) { searchInput.value = ''; } applyFilter(); });
     if (btnReload) btnReload.addEventListener('click', loadUsers);
-    if (pageSizeEl) pageSizeEl.addEventListener('change', () => { pageSize = parseInt(pageSizeEl.value,10); currentPage = 1; renderPage(); });
+    if (pageSizeEl) pageSizeEl.addEventListener('change', () => { pageSize = parseInt(pageSizeEl.value, 10); currentPage = 1; renderPage(); });
     if (btnPrev) btnPrev.addEventListener('click', () => { currentPage -= 1; renderPage(); });
     if (btnNext) btnNext.addEventListener('click', () => { currentPage += 1; renderPage(); });
 
     loadUsers();
   </script>
 </body>
+
 </html>

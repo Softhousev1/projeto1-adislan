@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,8 +39,13 @@
     }
 
     @keyframes spin {
-      0% { transform: translate(-50%, -50%) rotate(0deg); }
-      100% { transform: translate(-50%, -50%) rotate(360deg); }
+      0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+      }
+
+      100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+      }
     }
 
     .avatar-container {
@@ -59,23 +65,31 @@
       opacity: 1;
       transition: opacity 0.5s ease;
     }
-    
+
     /* Classes para animação de fade-out */
     .fade-out {
       opacity: 0 !important;
     }
-    
+
     /* Animação pulsante para o botão de upload */
     .upload-btn {
       animation: pulse 2s infinite;
     }
-    
+
     @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
+
+      100% {
+        transform: scale(1);
+      }
     }
-    
+
     /* Efeito de hover na imagem de perfil */
     .avatar:hover {
       filter: brightness(1.1);
@@ -83,6 +97,7 @@
     }
   </style>
 </head>
+
 <body>
   <!-- Menu superior -->
   <header class="main-header">
@@ -115,7 +130,7 @@
               <h2>Meu Perfil</h2>
               <p class="text-muted">Gerencie suas informações pessoais</p>
             </div>
-            
+
             <!-- Avatar -->
             <div class="profile-avatar">
               <div class="avatar-container">
@@ -128,7 +143,7 @@
                 <input type="file" id="fileInput" accept="image/*">
               </div>
             </div>
-            
+
             <!-- Formulário -->
             <div class="profile-form">
               <form id="profileForm">
@@ -140,7 +155,7 @@
                       <input type="text" class="form-control" id="nome" placeholder="Digite seu nome" required>
                     </div>
                   </div>
-                  
+
                   <div class="col-md-6 mb-3">
                     <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
                     <div class="input-group">
@@ -150,7 +165,7 @@
                     <small class="text-muted">O email não pode ser alterado</small>
                   </div>
                 </div>
-                
+
                 <div class="row">
                   <div class="col-md-6 mb-3">
                     <label for="senha" class="form-label">Senha</label>
@@ -163,7 +178,7 @@
                     </div>
                     <small class="text-muted">Deixe em branco para manter a senha atual</small>
                   </div>
-                  
+
                   <div class="col-md-6 mb-3">
                     <label for="telefone" class="form-label">Telefone</label>
                     <div class="input-group">
@@ -173,7 +188,7 @@
                     <small class="text-muted">Campo opcional</small>
                   </div>
                 </div>
-                
+
                 <div class="mb-3">
                   <label for="endereco" class="form-label">Endereço</label>
                   <div class="input-group">
@@ -182,14 +197,14 @@
                   </div>
                   <small class="text-muted">Campo opcional</small>
                 </div>
-                
+
                 <div class="d-grid gap-2 mt-4">
                   <button type="submit" class="btn btn-primary profile-save-btn" id="save-button">
                     <i class="fas fa-save me-2"></i> Salvar Alterações
                   </button>
                 </div>
               </form>
-              
+
               <div class="alert mt-3" role="alert" id="mensagem" style="display: none;"></div>
             </div>
           </div>
@@ -200,13 +215,13 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  
+
   <!-- Cliente Supabase Centralizado -->
   <script type="module" src="supabase-client.js"></script>
-  
+
   <!-- Script auth-ui.js deve ser carregado após a inicialização do Supabase -->
   <script src="auth-ui.js"></script>
-  
+
   <script>
     // Função para obter o cliente Supabase já inicializado
     function getSupabaseClient() {
@@ -215,90 +230,90 @@
         console.log('[perfil] Usando cliente Supabase existente (window.supabaseClient)');
         return window.supabaseClient;
       }
-      
+
       if (typeof window.supabase !== 'undefined' && window.supabase) {
         console.log('[perfil] Usando cliente Supabase existente (window.supabase)');
         return window.supabase;
       }
-      
+
       console.error('[perfil] ERRO: Cliente Supabase não encontrado');
       return null;
     }
-    
+
     // Variáveis globais
     let userId = null;
     let userSession = null;
-    
+
     // Verificar se o usuário está logado
-    document.addEventListener('DOMContentLoaded', async function() {
+    document.addEventListener('DOMContentLoaded', async function () {
       try {
         console.log('[perfil] Inicializando página de perfil...');
-        
+
         // Garantir que temos um cliente Supabase válido
         // Aguardar um momento para garantir que o módulo ESM do Supabase tenha sido carregado
         setTimeout(async () => {
           const supabaseClient = getSupabaseClient();
-          
+
           if (!supabaseClient) {
             console.error('[perfil] Não foi possível inicializar o cliente Supabase');
             showMessage("Erro ao conectar com o servidor. Por favor, recarregue a página.", "danger");
             return;
           }
-          
+
           console.log('[perfil] Cliente Supabase inicializado com sucesso');
-          
+
           const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
           console.log('[perfil] Dados do usuário no localStorage:', loggedInUser);
-          
+
           if (!loggedInUser || !loggedInUser.email) {
             // Redirecionar para a página de login se não estiver logado
             console.log('[perfil] Usuário não está logado, redirecionando para login');
             window.location.href = 'login.html';
             return;
           }
-          
+
           // Preencher o campo de email
           document.getElementById('email').value = loggedInUser.email;
-          
+
           // Preencher o campo de nome com o primeiro nome do email (temporário)
           const firstName = loggedInUser.email.split('@')[0];
           document.getElementById('nome').value = firstName;
-          
+
           // Preencher outros campos do localStorage se disponíveis
           if (loggedInUser.nome) {
             document.getElementById('nome').value = loggedInUser.nome;
           }
-          
+
           if (loggedInUser.telefone) {
             document.getElementById('telefone').value = loggedInUser.telefone;
           }
-          
+
           if (loggedInUser.endereco) {
             document.getElementById('endereco').value = loggedInUser.endereco;
           }
-          
+
           // Verificar se o cliente tem o método getSession
           if (!supabaseClient.auth || typeof supabaseClient.auth.getSession !== 'function') {
             console.error('[perfil] Cliente Supabase não tem método getSession');
             showMessage("Erro de autenticação. Por favor, faça login novamente.", "danger");
             return;
           }
-          
+
           console.log('[perfil] Chamando getSession...');
-          
+
           // Obter a sessão do usuário
           try {
             const { data, error: sessionError } = await supabaseClient.auth.getSession();
-            
+
             if (sessionError) {
               console.error('[perfil] Erro ao obter sessão:', sessionError);
               showMessage("Erro ao verificar sua sessão. Por favor, faça login novamente.", "danger");
               return;
             }
-            
+
             const session = data?.session;
             console.log('[perfil] Sessão obtida:', session ? 'Válida' : 'Inválida');
-            
+
             if (!session) {
               console.warn('[perfil] Sessão não encontrada');
               // Mesmo sem sessão, permitimos visualizar o perfil com dados básicos do localStorage
@@ -306,11 +321,11 @@
               userId = loggedInUser.id || 'unknown';
               return;
             }
-            
+
             userSession = session;
             userId = session.user.id;
             console.log('[perfil] ID do usuário:', userId);
-            
+
             // Buscar perfil do usuário
             await loadUserProfile();
           } catch (sessionError) {
@@ -324,7 +339,7 @@
         showMessage("Ocorreu um erro ao carregar seu perfil.", "danger");
       }
     });
-    
+
     // Carregar perfil do usuário
     async function loadUserProfile() {
       try {
@@ -332,27 +347,27 @@
           console.error('[perfil] userId ou supabaseClient não disponíveis');
           return;
         }
-        
+
         // Buscar dados do perfil
         const { data: profile, error: profileError } = await supabaseClient
           .from('profiles')
           .select('*')
           .eq('id', userId)
           .single();
-        
+
         if (profileError) {
           console.error('[perfil] Erro ao buscar perfil:', profileError);
           // Se não encontrou o perfil, pode ser que o usuário ainda não tenha um
           // Nesse caso, usamos os dados do localStorage
           return;
         }
-        
+
         // Preencher campos com dados do perfil
         if (profile) {
           document.getElementById('nome').value = profile.full_name || '';
           document.getElementById('telefone').value = profile.phone || '';
           document.getElementById('endereco').value = profile.address || '';
-          
+
           // Se tiver avatar, exibir
           if (profile.avatar_url) {
             document.getElementById('preview').src = profile.avatar_url;
@@ -363,13 +378,13 @@
         showMessage("Erro ao carregar dados do perfil.", "danger");
       }
     }
-    
+
     // Preview da foto de perfil e armazenamento local
     const fileInput = document.getElementById('fileInput');
     const preview = document.getElementById('preview');
     const avatarOverlay = document.getElementById('avatar-overlay');
     const avatarSpinner = document.getElementById('avatar-spinner');
-    
+
     // Função para salvar a imagem no localStorage
     function saveImageToLocalStorage(imageBase64) {
       try {
@@ -378,12 +393,12 @@
         profileData.avatarImage = imageBase64;
         localStorage.setItem('profileFormData', JSON.stringify(profileData));
         console.log('[perfil] Imagem salva no localStorage');
-        
+
         // Também salvar no loggedInUser para manter consistência
         const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser')) || {};
         loggedInUser.avatarImage = imageBase64;
         localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-        
+
         return true;
       } catch (error) {
         console.error('[perfil] Erro ao salvar imagem no localStorage:', error);
@@ -394,7 +409,7 @@
         return false;
       }
     }
-    
+
     // Função para carregar a imagem do localStorage
     function loadImageFromLocalStorage() {
       try {
@@ -405,7 +420,7 @@
           console.log('[perfil] Imagem carregada do localStorage (profileFormData)');
           return true;
         }
-        
+
         // Se não encontrar, tentar do loggedInUser
         const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser')) || {};
         if (loggedInUser.avatarImage) {
@@ -413,28 +428,28 @@
           console.log('[perfil] Imagem carregada do localStorage (loggedInUser)');
           return true;
         }
-        
+
         return false;
       } catch (error) {
         console.error('[perfil] Erro ao carregar imagem do localStorage:', error);
         return false;
       }
     }
-    
+
     // Carregar a imagem do localStorage ao iniciar a página
-    window.addEventListener('load', function() {
+    window.addEventListener('load', function () {
       loadImageFromLocalStorage();
     });
-    
-    fileInput.addEventListener('change', function() {
+
+    fileInput.addEventListener('change', function () {
       const file = this.files[0];
       if (file) {
         console.log('[perfil] Arquivo selecionado:', file.name, 'Tamanho:', (file.size / 1024).toFixed(2), 'KB', 'Tipo:', file.type);
-        
+
         // Mostrar overlay e spinner
         avatarOverlay.style.display = 'block';
         avatarSpinner.style.display = 'block';
-        
+
         // Verificar se o arquivo é uma imagem
         if (!file.type.match('image.*')) {
           console.error('[perfil] O arquivo selecionado não é uma imagem');
@@ -443,7 +458,7 @@
           avatarSpinner.style.display = 'none';
           return;
         }
-        
+
         // Verificar tamanho do arquivo (limite de 10MB)
         if (file.size > 10 * 1024 * 1024) {
           console.error('[perfil] Imagem muito grande:', (file.size / 1024 / 1024).toFixed(2), 'MB');
@@ -452,15 +467,15 @@
           avatarSpinner.style.display = 'none';
           return;
         }
-        
+
         // Verificar e mostrar informações sobre o formato e tamanho
         console.log('[perfil] Formato da imagem:', file.type);
         console.log('[perfil] Tamanho da imagem:', (file.size / 1024).toFixed(2), 'KB');
-        
+
         // Verificar se é JPG ou PNG especificamente
         const isJpg = file.type === 'image/jpeg' || file.type === 'image/jpg';
         const isPng = file.type === 'image/png';
-        
+
         if (isJpg) {
           console.log('[perfil] Formato JPG detectado e aceito');
         } else if (isPng) {
@@ -468,25 +483,25 @@
         } else {
           console.log('[perfil] Outro formato de imagem detectado:', file.type);
         }
-        
+
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
           const imageBase64 = e.target.result;
           preview.src = imageBase64;
           console.log('[perfil] Preview da imagem carregado');
-          
+
           // Salvar a imagem no localStorage
           const saved = saveImageToLocalStorage(imageBase64);
           if (saved) {
             showMessage("Imagem carregada com sucesso! Clique em 'Salvar Alterações' para confirmar.", "success");
           }
-          
+
           // Esconder spinner após carregar preview com uma animação mais visível
           setTimeout(() => {
             // Adicionar classe de fade-out para uma animação mais suave
             avatarOverlay.classList.add('fade-out');
             avatarSpinner.classList.add('fade-out');
-            
+
             // Remover completamente após a animação terminar
             setTimeout(() => {
               avatarOverlay.style.display = 'none';
@@ -496,23 +511,23 @@
             }, 500);
           }, 800);
         };
-        
-        reader.onerror = function(e) {
+
+        reader.onerror = function (e) {
           console.error('[perfil] Erro ao ler arquivo:', e);
           showMessage("Erro ao processar a imagem selecionada.", "danger");
           avatarOverlay.style.display = 'none';
           avatarSpinner.style.display = 'none';
         };
-        
+
         reader.readAsDataURL(file);
       }
     });
-    
+
     // Toggle para mostrar/ocultar senha
-    document.querySelector('.toggle-password').addEventListener('click', function() {
+    document.querySelector('.toggle-password').addEventListener('click', function () {
       const senhaInput = document.getElementById('senha');
       const icon = this.querySelector('i');
-      
+
       if (senhaInput.type === 'password') {
         senhaInput.type = 'text';
         icon.classList.remove('fa-eye');
@@ -523,17 +538,17 @@
         icon.classList.add('fa-eye');
       }
     });
-    
+
     // Validação do formulário
     const form = document.getElementById('profileForm');
     const mensagem = document.getElementById('mensagem');
     const saveButton = document.getElementById('save-button');
-    
+
     // Salvar estado do formulário para evitar perda de dados em recarregamento
     function saveFormState() {
       // Preservar a imagem se já estiver salva
       const existingData = JSON.parse(localStorage.getItem('profileFormData')) || {};
-      
+
       const formData = {
         nome: document.getElementById('nome').value,
         email: document.getElementById('email').value,
@@ -542,11 +557,11 @@
         // Manter a imagem se existir
         avatarImage: existingData.avatarImage || null
       };
-      
+
       localStorage.setItem('profileFormData', JSON.stringify(formData));
       console.log('[perfil] Estado do formulário salvo', formData.avatarImage ? '(com imagem)' : '(sem imagem)');
     }
-    
+
     // Restaurar estado do formulário se disponível
     function restoreFormState() {
       const savedData = localStorage.getItem('profileFormData');
@@ -557,7 +572,7 @@
           if (formData.email) document.getElementById('email').value = formData.email;
           if (formData.telefone) document.getElementById('telefone').value = formData.telefone;
           if (formData.endereco) document.getElementById('endereco').value = formData.endereco;
-          
+
           // Restaurar imagem se disponível
           if (formData.avatarImage) {
             document.getElementById('preview').src = formData.avatarImage;
@@ -568,7 +583,7 @@
         }
       }
     }
-    
+
     // Adicionar evento para salvar estado do formulário periodicamente
     const formFields = ['nome', 'telefone', 'endereco'];
     formFields.forEach(fieldId => {
@@ -577,49 +592,49 @@
         field.addEventListener('input', saveFormState);
       }
     });
-    
+
     // Tentar restaurar estado do formulário ao carregar a página
     window.addEventListener('load', restoreFormState);
-    
-    form.addEventListener('submit', async function(e) {
+
+    form.addEventListener('submit', async function (e) {
       e.preventDefault();
-      
+
       // Salvar estado atual do formulário
       saveFormState();
-      
+
       // Verificar se o cliente Supabase está disponível
       if (!supabaseClient) {
         showMessage("Erro de conexão. Por favor, recarregue a página e tente novamente.", "danger");
         return;
       }
-      
+
       const nome = document.getElementById('nome').value.trim();
       const email = document.getElementById('email').value.trim();
       const senha = document.getElementById('senha').value.trim();
       const telefone = document.getElementById('telefone').value.trim();
       const endereco = document.getElementById('endereco').value.trim();
-      
+
       // Validar campos obrigatórios
       if (nome === "" || email === "") {
         showMessage("Preencha os campos obrigatórios!", "danger");
         return;
       }
-      
+
       // Validar formato do telefone (se preenchido)
       if (telefone && !/^\(\d{2}\) \d{4,5}-\d{4}$/.test(telefone)) {
         showMessage("Telefone deve estar no formato (99) 99999-9999", "warning");
         return;
       }
-      
+
       // Desabilitar botão e mostrar loading
       saveButton.disabled = true;
       const originalButtonText = saveButton.innerHTML;
       saveButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Salvando...';
-      
+
       try {
         // Verificar se temos uma sessão válida
         let currentUserId = userId;
-        
+
         if (!currentUserId || currentUserId === 'unknown') {
           // Tentar obter a sessão novamente
           try {
@@ -631,22 +646,22 @@
             } else {
               // Sem sessão, salvamos apenas localmente
               console.log('[perfil] Sem sessão válida, salvando apenas localmente');
-              
+
               // Salvar no localStorage
               const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser')) || {};
               loggedInUser.nome = nome;
-              
+
               // Armazenar telefone e endereço no localStorage
               if (telefone) {
                 loggedInUser.telefone = telefone;
               }
-              
+
               if (endereco) {
                 loggedInUser.endereco = endereco;
               }
-              
+
               localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-              
+
               showMessage("Informações salvas localmente. Para salvar no servidor, faça login novamente.", "warning");
               saveButton.disabled = false;
               saveButton.innerHTML = originalButtonText;
@@ -654,39 +669,39 @@
             }
           } catch (sessionError) {
             console.error('[perfil] Erro ao obter sessão para salvar:', sessionError);
-            
+
             // Salvar no localStorage como fallback
             const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser')) || {};
             loggedInUser.nome = nome;
-            
+
             // Armazenar telefone e endereço no localStorage
             if (telefone) {
               loggedInUser.telefone = telefone;
             }
-            
+
             if (endereco) {
               loggedInUser.endereco = endereco;
             }
-            
+
             localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-            
+
             showMessage("Informações salvas localmente. Para salvar no servidor, faça login novamente.", "warning");
             saveButton.disabled = false;
             saveButton.innerHTML = originalButtonText;
             return;
           }
         }
-        
+
         // Verificar se a tabela profiles existe
         try {
           // Verificar se podemos acessar a tabela profiles
           const { count, error: countError } = await supabaseClient
             .from('profiles')
             .select('*', { count: 'exact', head: true });
-          
+
           if (countError) {
             console.error('[perfil] Erro ao verificar tabela profiles:', countError);
-            
+
             // Tentar criar o perfil se a tabela existir mas o perfil não
             if (countError.code === 'PGRST116') {
               console.log('[perfil] Tabela profiles existe, mas pode não ter registros');
@@ -694,14 +709,14 @@
               throw new Error('Tabela profiles não está acessível');
             }
           }
-          
+
           console.log('[perfil] Tabela profiles verificada com sucesso');
         } catch (tableError) {
           console.error('[perfil] Erro ao verificar tabela profiles:', tableError);
           showMessage("Erro ao acessar o banco de dados. Contate o administrador.", "danger");
           return;
         }
-        
+
         // Atualizar perfil no Supabase
         // Preparar objeto de atualização com campos básicos
         const updates = {
@@ -709,57 +724,57 @@
           full_name: nome,
           updated_at: new Date()
         };
-        
+
         // Adicionar telefone se fornecido
         if (telefone) {
           updates.phone = telefone;
         }
-        
+
         // Adicionar endereço se fornecido
         if (endereco) {
           updates.address = endereco;
         }
-        
+
         console.log('[perfil] Objeto de atualização preparado:', updates);
         console.log('[perfil] Atualizando perfil com dados:', updates);
-        
+
         try {
           const { error: updateError } = await supabaseClient
             .from('profiles')
             .upsert(updates, { returning: 'minimal' });
-        
+
           if (updateError) {
             console.error('[perfil] Erro ao atualizar perfil:', updateError);
-            
+
             // Verificar se é um erro de permissão ou de tabela não existente
             if (updateError.code === '42501' || updateError.code === '42P01') {
               console.error('[perfil] Erro de permissão ou tabela não existe');
-              
+
               // Tentar criar o perfil
               try {
-              // Preparar objeto para inserção
-              const insertData = {
-                id: currentUserId,
-                full_name: nome,
-                updated_at: new Date()
-              };
-              
-              // Adicionar telefone se fornecido
-              if (telefone) {
-                insertData.phone = telefone;
-              }
-              
-              // Adicionar endereço se fornecido
-              if (endereco) {
-                insertData.address = endereco;
-              }
-              
-              console.log('[perfil] Tentando criar perfil com dados:', insertData);
-              
-              const { error: insertError } = await supabaseClient
-                .from('profiles')
-                .insert(insertData);
-                  
+                // Preparar objeto para inserção
+                const insertData = {
+                  id: currentUserId,
+                  full_name: nome,
+                  updated_at: new Date()
+                };
+
+                // Adicionar telefone se fornecido
+                if (telefone) {
+                  insertData.phone = telefone;
+                }
+
+                // Adicionar endereço se fornecido
+                if (endereco) {
+                  insertData.address = endereco;
+                }
+
+                console.log('[perfil] Tentando criar perfil com dados:', insertData);
+
+                const { error: insertError } = await supabaseClient
+                  .from('profiles')
+                  .insert(insertData);
+
                 if (insertError) {
                   console.error('[perfil] Erro ao criar perfil:', insertError);
                   showMessage("Erro ao criar perfil. Contate o administrador.", "danger");
@@ -782,84 +797,23 @@
           showMessage("Erro ao atualizar perfil. Contate o administrador.", "danger");
           return;
         }
-        
+
         // Atualizar senha (se preenchida)
         if (senha) {
           const { error: passwordError } = await supabaseClient.auth.updateUser({
             password: senha
           });
-          
+
           if (passwordError) {
             console.error('[perfil] Erro ao atualizar senha:', passwordError);
             showMessage("Perfil atualizado, mas houve um erro ao alterar a senha.", "warning");
             return;
           }
         }
-        
+
         // A imagem já foi salva no localStorage quando foi selecionada
         // Aqui apenas verificamos se há uma imagem para processar
         const profileData = JSON.parse(localStorage.getItem('profileFormData')) || {};
-        if (profileData.avatarImage) {
-          console.log('[perfil] Imagem encontrada no localStorage, já foi processada');
-          
-          // Em um ambiente de produção, aqui faríamos o upload para o Supabase
-          // Mas em ambiente local, apenas confirmamos que a imagem foi salva
-          
-          if (isLocalEnvironment()) {
-            console.log('[perfil] Ambiente local detectado, não fazendo upload para Supabase');
-            
-            // Atualizar também no loggedInUser para manter consistência
-            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser')) || {};
-            loggedInUser.avatarImage = profileData.avatarImage;
-            localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-            
-            // Atualizar a imagem na página para garantir
-            document.getElementById('preview').src = profileData.avatarImage;
-          } else {
-            // Código para ambiente de produção com Supabase
-            // Este código está comentado para não ser executado localmente
-            /*
-            try {
-              // Mostrar overlay e spinner durante o upload
-              avatarOverlay.style.display = 'block';
-              avatarSpinner.style.display = 'block';
-              
-              // Converter Base64 para Blob para upload
-              const avatarBlob = base64ToBlob(profileData.avatarImage);
-              const fileName = `${currentUserId}_${Date.now()}.png`;
-              
-              console.log('[perfil] Fazendo upload de imagem para bucket profiles, arquivo:', fileName);
-              
-              const { error: uploadError } = await supabaseClient
-                .storage
-                .from('profiles')
-                .upload(fileName, avatarBlob, {
-                  cacheControl: '3600',
-                  upsert: true
-                });
-              
-              if (uploadError) {
-                throw uploadError;
-              }
-              
-              // Obter URL pública do avatar
-              const { data: { publicUrl } } = supabaseClient
-                .storage
-                .from('profiles')
-                .getPublicUrl(fileName);
-              
-              // Atualizar avatar_url no perfil
-              await supabaseClient
-                .from('profiles')
-                .update({ avatar_url: publicUrl })
-                .eq('id', currentUserId);
-              
-            } catch (error) {
-              console.error('[perfil] Erro ao fazer upload da imagem:', error);
-              showMessage("Erro ao salvar a imagem no servidor.", "warning");
-            } finally {
-              avatarOverlay.style.display = 'none';
-              avatarSpinner.style.display = 'none';
         const file = document.getElementById('fileInput').files[0];
 
         if (file) {
@@ -876,7 +830,6 @@
               await supabaseClient.storage.from('profiles').remove([oldFileName]);
               console.log('[perfil] Imagem antiga removida do storage.');
             }
-            */
 
             // Faz o upload da nova imagem
             const fileName = `${currentUserId}_${Date.now()}_${file.name}`;
@@ -907,14 +860,7 @@
             avatarSpinner.style.display = 'none';
           }
         }
-        
-        // Função para detectar ambiente local
-        function isLocalEnvironment() {
-          return window.location.hostname === 'localhost' || 
-                 window.location.hostname === '127.0.0.1' ||
-                 window.location.hostname.includes('192.168.');
-        }
-        
+
         // Função para converter Base64 para Blob (usada em ambiente de produção)
         function base64ToBlob(base64) {
           const parts = base64.split(';base64,');
@@ -922,29 +868,29 @@
           const raw = window.atob(parts[1]);
           const rawLength = raw.length;
           const uInt8Array = new Uint8Array(rawLength);
-          
+
           for (let i = 0; i < rawLength; ++i) {
             uInt8Array[i] = raw.charCodeAt(i);
           }
-          
+
           return new Blob([uInt8Array], { type: contentType });
         }
-        
+
         // Atualizar também no localStorage para manter consistência
         const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser')) || {};
         loggedInUser.nome = nome;
-        
+
         // Armazenar telefone e endereço no localStorage mesmo que não estejam no Supabase
         if (telefone) {
           loggedInUser.telefone = telefone;
         }
-        
+
         if (endereco) {
           loggedInUser.endereco = endereco;
         }
-        
+
         localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-        
+
         showMessage("Alterações salvas com sucesso!", "success");
       } catch (error) {
         console.error('[perfil] Erro ao salvar alterações:', error);
@@ -955,11 +901,11 @@
         saveButton.innerHTML = originalButtonText;
       }
     });
-    
+
     function showMessage(text, type, details = null) {
       // Limpar mensagem anterior
       mensagem.innerHTML = '';
-      
+
       // Adicionar ícone baseado no tipo de mensagem
       let icon = '';
       switch (type) {
@@ -976,44 +922,45 @@
           icon = '<i class="fas fa-info-circle me-2"></i>';
           break;
       }
-      
+
       // Criar conteúdo da mensagem
       let messageContent = `${icon}${text}`;
-      
+
       // Adicionar detalhes se fornecidos
       if (details) {
         messageContent += `<div class="small mt-2">${details}</div>`;
       }
-      
+
       // Adicionar botão de fechar
       messageContent += '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>';
-      
+
       // Definir conteúdo e estilo
       mensagem.innerHTML = messageContent;
       mensagem.className = `alert alert-${type} alert-dismissible fade show`;
       mensagem.style.display = 'block';
-      
+
       // Adicionar evento para fechar manualmente
       const closeButton = mensagem.querySelector('.btn-close');
       if (closeButton) {
-        closeButton.addEventListener('click', function() {
+        closeButton.addEventListener('click', function () {
           mensagem.style.display = 'none';
         });
       }
-      
+
       // Rolar até a mensagem
       mensagem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      
+
       // Esconder a mensagem após 5 segundos se for sucesso
       if (type === 'success') {
         setTimeout(() => {
           mensagem.style.display = 'none';
         }, 5000);
       }
-      
+
       // Registrar no console para depuração
       console.log(`[perfil] Mensagem (${type}):`, text, details || '');
     }
   </script>
 </body>
+
 </html>
