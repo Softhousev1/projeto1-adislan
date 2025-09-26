@@ -1,4 +1,5 @@
-Clonar o projeto  
+Clonar o projeto
+Adislan  Fernandes
 
 1.git status
 2.git branch        		verificar branch
