@@ -248,6 +248,17 @@
         if (error) {
           showMessage(`Erro: ${error.message}`, true);
         } else if (data.user) {
+          // Garante que o usuário apareça na lista (profiles)
+          try {
+            const userId = data.user.id;
+            const defaultName = (email.split('@')[0] || '').trim();
+            await supabaseClient
+              .from('profiles')
+              .upsert({ id: userId, full_name: defaultName, email: email, role: 'user', status: 'active' }, { onConflict: 'id' });
+          } catch (e) {
+            console.warn('Não foi possível criar/atualizar perfil (profiles):', e);
+          }
+
           showToastNotification('Conta criada com sucesso!');
           setTimeout(() => {
             window.location.href = 'login.html';
