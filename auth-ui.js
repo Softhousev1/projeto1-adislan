@@ -4,52 +4,11 @@
     console.log('[auth-ui] Inicializando script de autenticação UI');
     
     // Obtém ou cria o cliente Supabase
-    let authClient;
+    let authClient = window.supabaseClient || window.supabase;
     
-    // Verifica se já existe um cliente Supabase global
-    if (typeof window.supabaseClient !== 'undefined') {
-        console.log('[auth-ui] Usando cliente Supabase existente (window.supabaseClient)');
-        authClient = window.supabaseClient;
-    } else if (typeof window.supabase !== 'undefined') {
-        console.log('[auth-ui] Usando cliente Supabase existente (window.supabase)');
-        authClient = window.supabase;
-    } else {
-        console.log('[auth-ui] Aguardando cliente Supabase ser inicializado por outro script');
-        // Espera até que o cliente seja inicializado em outro script
-        const checkInterval = setInterval(() => {
-            if (typeof window.supabaseClient !== 'undefined') {
-                console.log('[auth-ui] Cliente Supabase encontrado (window.supabaseClient)');
-                authClient = window.supabaseClient;
-                clearInterval(checkInterval);
-                initializeUI(); // Inicializa a UI quando o cliente estiver disponível
-            }
-        }, 100);
-        
-        // Timeout após 5 segundos para evitar espera infinita
-        setTimeout(() => {
-            if (!authClient) {
-                console.error('[auth-ui] Timeout ao aguardar cliente Supabase');
-                clearInterval(checkInterval);
-                // Fallback para um objeto vazio com métodos vazios para evitar erros
-                authClient = {
-                    auth: { 
-                        getSession: async () => ({ data: { session: null } }),
-                        signOut: async () => {}
-                    },
-                    from: () => ({
-                        select: () => ({
-                            eq: () => ({
-                                single: () => ({ data: null, error: null })
-                            })
-                        })
-                    })
-                };
-                initializeUI(); // Inicializa a UI mesmo com o cliente fallback
-            }
-        }, 5000);
-        
-        // Retorna aqui para evitar a execução do restante do código até que o cliente esteja pronto
-        return;
+    // Se o cliente não estiver pronto, a inicialização ocorrerá no DOMContentLoaded
+    if (!authClient) {
+        console.warn('[auth-ui] Cliente Supabase não encontrado na inicialização. Tentará novamente no DOMContentLoaded.');
     }
 
     function updateHeaderUI() {
@@ -230,14 +189,12 @@
     
     // Inicializa quando o DOM estiver pronto
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('[auth-ui] DOM carregado');
-        // Verifica se já temos o cliente Supabase
-        if (authClient) {
-            console.log('[auth-ui] Cliente Supabase já disponível, inicializando componentes');
-            initializeUI();
-        } else {
-            console.log('[auth-ui] Aguardando cliente Supabase para inicializar componentes');
-            // A inicialização será feita quando o cliente estiver disponível
+        console.log('[auth-ui] DOM carregado.');
+        // Garante que estamos usando a versão mais recente do cliente, caso tenha sido carregado depois.
+        if (!authClient) {
+            authClient = window.supabaseClient || window.supabase;
         }
+        console.log('[auth-ui] Inicializando componentes da UI.');
+        initializeUI();
     });
 })();

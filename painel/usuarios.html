@@ -61,7 +61,7 @@
           <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
             <div style="width:60%"><p style="margin:0;color:var(--muted)">Liste, busque, pagine, altere papéis e remova usuários.</p></div>
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-              <button class="btn green" onclick="window.location.href='../cadastro.html'">+ Adicionar Usuário</button>
+              <button class="btn green" id="btnOpenAddUser">+ Adicionar Usuário</button>
               <input id="searchInput" type="text" placeholder="Buscar por nome ou email" style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px;min-width:220px">
               <button class="btn grey" id="btnSearch">Buscar</button>
               <button class="btn" id="btnClear">Limpar</button>
@@ -108,6 +108,56 @@
     </main>
   </div>
 
+  <!-- Modal: Adicionar Usuário -->
+  <div id="addUserModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Adicionar Usuário</h2>
+        <span class="close-button" id="closeAddUser">×</span>
+      </div>
+      <div class="modal-body">
+        <form id="addUserForm">
+          <div class="form-row">
+            <div style="flex:1">
+              <label for="auName">Nome completo</label>
+              <input type="text" id="auName" placeholder="Ex: Maria Almeida" required>
+            </div>
+            <div style="flex:1">
+              <label for="auEmail">Email</label>
+              <input type="text" id="auEmail" placeholder="email@dominio.com" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div style="flex:1">
+              <label for="auPassword">Senha inicial</label>
+              <input type="text" id="auPassword" placeholder="Defina uma senha temporária" required>
+            </div>
+            <div style="flex:1">
+              <label for="auRole">Papel</label>
+              <select id="auRole">
+                <option value="user">Usuário</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div style="flex:1">
+              <label for="auStatus">Status</label>
+              <select id="auStatus">
+                <option value="active">Ativo</option>
+                <option value="inactive">Inativo</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row" style="justify-content:flex-end">
+            <button type="button" class="btn" id="btnCancelAddUser">Cancelar</button>
+            <button type="submit" class="btn green" id="btnSubmitAddUser">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script>
     const usersBody = document.getElementById('usersBody');
     const usersEmpty = document.getElementById('usersEmpty');
@@ -120,6 +170,20 @@
     const btnNext = document.getElementById('btnNext');
     const pageIndicator = document.getElementById('pageIndicator');
     const resultsInfo = document.getElementById('resultsInfo');
+    // Modal elements
+    const addUserModal = document.getElementById('addUserModal');
+    const btnOpenAddUser = document.getElementById('btnOpenAddUser');
+    const btnCancelAddUser = document.getElementById('btnCancelAddUser');
+    const closeAddUser = document.getElementById('closeAddUser');
+    const addUserForm = document.getElementById('addUserForm');
+    const auName = document.getElementById('auName');
+    const auEmail = document.getElementById('auEmail');
+    const auPassword = document.getElementById('auPassword');
+    const auRole = document.getElementById('auRole');
+    const auStatus = document.getElementById('auStatus');
+    const btnSubmitAddUser = document.getElementById('btnSubmitAddUser');
+    // Backend URL (pode sobrescrever via localStorage.setItem('backendUrl', 'http://localhost:3000'))
+    const backendUrl = localStorage.getItem('backendUrl') || 'http://localhost:3000';
 
     let allUsers = [];
     let filteredUsers = [];
@@ -196,19 +260,34 @@
     }
 
     async function loadUsers(){
-      // Assume tabela `profiles` com colunas: id, full_name, email, role
-      // Adicionamos a coluna 'status'
-      const { data, error } = await supa
-        .from('profiles')
-        .select('id, full_name, email, role, status')
-        .order('full_name', { ascending: true });
-      if (error){
-        console.error('Erro ao carregar usuários:', error);
-        alert('Não foi possível carregar usuários.');
-        return;
+      try {
+        // Primeira tentativa: direto do Supabase (cliente anon)
+        const { data, error } = await supa
+          .from('profiles')
+          .select('id, full_name, email, role, status')
+          .order('full_name', { ascending: true });
+        if (!error) {
+          allUsers = data || [];
+          applyFilter();
+          return;
+        }
+        console.warn('Falha no carregamento direto do Supabase, tentando backend...', error);
+      } catch (e){
+        console.warn('Exceção ao consultar Supabase direto, tentando backend...', e);
       }
-      allUsers = data || [];
-      applyFilter();
+
+      try {
+        const res = await fetch(`${backendUrl}/admin/users`, { method: 'GET' });
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+        const json = await res.json();
+        allUsers = json.users || [];
+        applyFilter();
+      } catch (e){
+        console.error('Erro ao carregar usuários via backend:', e);
+        alert('Não foi possível carregar usuários.');
+      }
     }
 
     async function saveRole(userId){
@@ -253,6 +332,61 @@
     // A função deleteUser foi substituída por toggleUserStatus, que é mais segura.
     // A exclusão real (deleteUser) exigiria uma função de servidor (Edge Function) para chamar a API de Admin do Supabase.
     // async function deleteUser(userId) { ... }
+
+    // --- Adicionar Usuário (Modal) ---
+    function openAddUserModal(){
+      if (addUserModal){ addUserModal.style.display = 'block'; }
+      if (auName){ auName.focus(); }
+    }
+    function closeAddUserModal(){
+      if (addUserModal){ addUserModal.style.display = 'none'; }
+      if (addUserForm){ addUserForm.reset(); }
+    }
+
+    async function handleAddUserSubmit(e){
+      e.preventDefault();
+      const name = (auName?.value || '').trim();
+      const email = (auEmail?.value || '').trim();
+      const password = (auPassword?.value || '').trim();
+      const role = auRole?.value || 'user';
+      const status = auStatus?.value || 'active';
+
+      if (!name || !email || !password){
+        alert('Preencha nome, email e senha.');
+        return;
+      }
+
+      btnSubmitAddUser.disabled = true;
+      btnSubmitAddUser.textContent = 'Salvando...';
+      try {
+        const res = await fetch(`${backendUrl}/admin/users`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ full_name: name, email, password, role, status })
+        });
+        const data = await res.json().catch(()=>({}));
+        if (!res.ok){
+          console.error('Erro ao criar usuário:', data);
+          alert(data?.error || 'Não foi possível criar o usuário.');
+          return;
+        }
+        alert('Usuário criado com sucesso!');
+        closeAddUserModal();
+        loadUsers();
+      } catch(err){
+        console.error(err);
+        alert('Falha de rede ao criar usuário.');
+      } finally {
+        btnSubmitAddUser.disabled = false;
+        btnSubmitAddUser.textContent = 'Salvar';
+      }
+    }
+
+    if (btnOpenAddUser) btnOpenAddUser.addEventListener('click', openAddUserModal);
+    if (btnCancelAddUser) btnCancelAddUser.addEventListener('click', closeAddUserModal);
+    if (closeAddUser) closeAddUser.addEventListener('click', closeAddUserModal);
+    if (addUserModal) addUserModal.addEventListener('click', (e)=>{ if (e.target === addUserModal) closeAddUserModal(); });
+    if (addUserForm) addUserForm.addEventListener('submit', handleAddUserSubmit);
 
 
     document.getElementById('btnLogout').onclick = async function(){

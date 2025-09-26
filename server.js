@@ -15,15 +15,86 @@ const supabaseServiceKey = config.supabase_service_key; // Chave de serviço (se
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 // Configurar middleware
-// Configuração específica do CORS para permitir requisições do frontend
+// CORS: permitir desenvolvimento local inclusive origem nula (file://)
 app.use(cors({
-  origin: ['http://127.0.0.1:5500', 'http://localhost:5500'], // Origens permitidas
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Métodos permitidos
-  allowedHeaders: ['Content-Type', 'Authorization'], // Cabeçalhos permitidos
-  credentials: true // Permite envio de cookies e credenciais
+  origin: (origin, callback) => {
+    // Permite qualquer origem em dev, incluindo null (file://)
+    callback(null, true);
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Rota Admin: listar usuários (via service key)
+app.get('/admin/users', async (req, res) => {
+  try {
+    if (!config.supabase_service_key || config.supabase_service_key === 'supabase_placeholder') {
+      return res.status(500).json({
+        error: 'SUPABASE_SERVICE_KEY não configurada no servidor',
+      });
+    }
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, full_name, email, role, status')
+      .order('full_name', { ascending: true });
+
+    if (error) {
+      return res.status(500).json({ error: 'Falha ao carregar usuários', details: error.message });
+    }
+    return res.json({ users: data || [] });
+  } catch (err) {
+    console.error('Erro /admin/users [GET]:', err);
+    return res.status(500).json({ error: 'Erro interno ao listar usuários', details: err.message });
+  }
+});
+
+// Rota Admin: criar usuário e perfil (requer SUPABASE_SERVICE_KEY no servidor)
+app.post('/admin/users', async (req, res) => {
+  try {
+    if (!config.supabase_service_key || config.supabase_service_key === 'supabase_placeholder') {
+      return res.status(500).json({
+        error: 'SUPABASE_SERVICE_KEY não configurada no servidor',
+        details: 'Defina a variável de ambiente SUPABASE_SERVICE_KEY ou ajuste config.js'
+      });
+    }
+    const { full_name, email, password, role = 'user', status = 'active' } = req.body || {};
+    if (!full_name || !email || !password) {
+      return res.status(400).json({ error: 'full_name, email e password são obrigatórios' });
+    }
+
+    // 1) Criar usuário de autenticação
+    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true
+    });
+    if (authError) {
+      return res.status(500).json({ error: 'Falha ao criar usuário de autenticação', details: authError.message });
+    }
+
+    const userId = authData.user?.id;
+    if (!userId) {
+      return res.status(500).json({ error: 'Usuário criado sem ID retornado' });
+    }
+
+    // 2) Upsert no perfil
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .upsert({ id: userId, full_name, email, role, status }, { onConflict: 'id' });
+    if (profileError) {
+      return res.status(500).json({ error: 'Falha ao criar/atualizar perfil', details: profileError.message });
+    }
+
+    return res.status(201).json({ id: userId, full_name, email, role, status });
+  } catch (err) {
+    console.error('Erro /admin/users:', err);
+    return res.status(500).json({ error: 'Erro interno ao criar usuário', details: err.message });
+  }
+});
 
 // Rota para criar sessão de checkout do Stripe
 app.post('/create-checkout-session', async (req, res) => {

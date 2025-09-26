@@ -1,8 +1,19 @@
+Clonar o projeto
+Adislan  Fernandes
+
+1.git status
+2.git branch        		verificar branch
+3.git checkout -b adislan    	mudar
+4.git add .       		prepara o commit
+5.git commit -m "Alteração   	faz o comit
+na pagina sobre"
+6.git push origin adislan         envia as alterações
+
 Testar aplicação
 
 admin@modaatual.com
 admin123
-Adislan
+
 
 
 Quando criar branchs use: feat/adicionar-pagina-contato
@@ -106,7 +117,7 @@ Integrações: API de pagamento Mercado Pago
 
 Simonesimm commented 16 minutes ago @Simonesimm Simonesimm 16 minutes agoedited by Simonesimm Collaborator Author 📄 Documento de Requisitos do Produto (PRD)
 
-Visão Geral Nome do Projeto: Moda Atual Objetivo: Desenvolver uma plataforma de e-commerce para venda de roupas.
+Visão Geral Nome do Projeto: Moda Online Objetivo: Desenvolver uma plataforma de e-commerce para venda de roupas.
 
 Público-alvo: todos
 
